@@ -31,10 +31,6 @@ class imageResizer{
 		} else {
 			throw new ImageResizerException('Unsupported image type');
 		}
-		
-		if (!$this->image) {
-            throw new ImageResizerException('Could not load image');
-        }
 				 
 	}
 		
