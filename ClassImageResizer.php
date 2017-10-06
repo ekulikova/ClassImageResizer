@@ -1,5 +1,5 @@
 <?php
-namespace ImageResizer;
+//namespace ImageResizer;
 
 class imageResizer{
 	private $image;
@@ -11,15 +11,15 @@ class imageResizer{
 	
 	public function __construct($source){
 		
-		 if (!is_file($filename))) {
-            throw new ImageResizerException('File does not exist');
+		 if (!is_file($source)) {
+            throw new ImageResizerException('File '.$source.' does not exist');
         }
         
 		$this->source=$source;
 		list($this->width, $this->height, $this->type) = getimagesize($source);
 		
-		if(!$this->wigdth || !$this->height){
-			throw new ImageResizerException('File is not an image');
+		if(!$this->width || !$this->height){
+			throw new ImageResizerException('File '.$source.' is not an image');
 		}
 				 
 		if( $this->type == IMAGETYPE_JPEG ) {
@@ -29,17 +29,17 @@ class imageResizer{
 		} elseif( $this->type == IMAGETYPE_PNG ) {
 			$this->image = imagecreatefrompng($source);       
 		} else {
-			throw new ImageResizerException('Unsupported image type');
+			throw new ImageResizerException('Unsupported image type. File '.$source);
 		}
 		
 		if (!$this->image) {
-            throw new ImageResizerException('Could not load image');
+            throw new ImageResizerException('Could not load image from '.$source);
         }
-				 
+        
 	}
 		
 	public function __destruct(){
-		return imagedestroy($this->image);
+		imagedestroy($this->image);
 	}
 	
 	public function update($new_image){
@@ -50,7 +50,7 @@ class imageResizer{
 		
 	}
 		
-	public function save($filename,$compression=75,$permissions=null){
+	public function save($filename,$compression=75,$permissions=0777){
 		
 		$filename or $filename=$this->source;
 		
@@ -62,10 +62,10 @@ class imageResizer{
 			imagepng($this->image,$filename);       
 		}       
 			
-		if( $permissions != null) {
+		if($permissions) {
 			chmod($filename,$permissions);       
 		}
-			
+		
 	}
 		
 	public function resize($new_width,$new_height){
@@ -76,7 +76,35 @@ class imageResizer{
 				
 	}
 	
-	public function resize_save_proportion($w,$h,$skip_small=1){
+	public function resizeToHeight($h,$skip_small=1){
+		
+		if($skip_small && $this->height<=$h){
+			return;
+		}
+		else{
+			$ratio = $this->height/$h;
+			$new_height=$this->height/$ratio;
+			
+			$this->resize($this->width,$new_height);
+		}
+		
+	}
+	
+	public function resizeToWidth($w,$skip_small=1){
+		
+		if($skip_small && $this->width<=$w){
+			return;
+		}
+		else{
+			$ratio = $this->width/$w;
+			$new_width=$this->width/$ratio;
+			
+			$this->resize($new_width,$this->height);
+		}
+		
+	}
+	
+	public function resizeToHeightWidth($w,$h,$skip_small=1){
 		
 		if($skip_small && $this->width<=$w && $this->height<=$h){
 			return;
@@ -85,30 +113,10 @@ class imageResizer{
 			$ratio = max($this->width/$w,$this->height/$h);
 			$new_width=$this->width/$ratio;
 			$new_height=$this->height/$ratio;
-			echo "$ratio $new_width,$new_height \n";
+			
 			$this->resize($new_width,$new_height);
 		}
 		
-	}
-	
-	public static function resizeDir($dir,$new_width,$new_height,$skip_small=1,$func_name='resize'){
-	echo "$func_name \n";
-		$files = scandir($dir);
- 
-		foreach($files as $f){
-			$full_name = $dir.'/'.$f;
-			
-			if(is_dir($full_name)){
-				if($f!='.' && $f!='..'){
-					//imageResizer::resizeDir($full_name);
-				}
-			} else { echo "$full_name \n";
-				$img = new imageResizer($full_name);
-				$img->$func_name($new_width,$new_height,$skip_small);
-				$img->save($full_name);
-			}
-		
-		}
 	}
 	
 }
