@@ -35,10 +35,13 @@ class imageResizer{
 		if (!$this->image) {
             throw new ImageResizerException('Could not load image from '.$source);
         }
-        
+        echo "\n __construct \n";
+				 var_dump($this->image);
 	}
 		
 	public function __destruct(){
+		echo "\n __destruct \n";
+				 var_dump($this->image);
 		imagedestroy($this->image);
 	}
 	
@@ -47,6 +50,8 @@ class imageResizer{
 		$this->image=$new_image;
 		$this->height=imagesy($this->image);
 		$this->widht=imagesx($this->image);
+		echo "\n update \n";
+				 var_dump($this->image);
 		
 	}
 		
@@ -65,7 +70,8 @@ class imageResizer{
 		if($permissions) {
 			chmod($filename,$permissions);       
 		}
-		
+			echo "\n save \n";
+				 var_dump($this->image);
 	}
 		
 	public function resize($new_width,$new_height){
@@ -73,7 +79,8 @@ class imageResizer{
 		$new_image = imagecreatetruecolor($new_width, $new_height);
 		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height);
 		$this->update($new_image);
-				
+				echo "\n resize \n";
+				 var_dump($this->image);
 	}
 	
 	public function resizeToHeight($h,$skip_small=1){
