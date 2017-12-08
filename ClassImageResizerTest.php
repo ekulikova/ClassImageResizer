@@ -19,13 +19,28 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
    * Loading tests
    */
 
-   public function testLoadGif()
+   /**
+    * @dataProvider providerLoadType
+    */
+
+   public function testLoad($type)
    {
-       $image = $this->createImage(1, 1, 'gif');
+       $image = $this->createImage(1, 1, $type);
        $resize = new imageResizer($image);
 
        $this->assertInstanceOf('imageResizer', $resize);
    }
+
+   public function providerLoadType ()
+    {
+      $types=array();
+
+      foreach ($this->image_types as $key=>$type) {
+          $types[$key]=[$type];
+      }
+      
+      return $types;
+    }
 
    /**
     * Helpers
