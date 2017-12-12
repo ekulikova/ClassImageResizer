@@ -74,12 +74,14 @@ class imageResizer{
 		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height);
 		$this->update($new_image);
 
+		return $this->image;
+
 	}
 
 	public function resizeToHeight($h,$skip_small=1){
 
 		if($skip_small && $this->height<=$h){
-			return;
+			return $this->image;
 		}
 		else{
 			$ratio = $this->height/$h;
@@ -88,12 +90,14 @@ class imageResizer{
 			$this->resize($this->width,$new_height);
 		}
 
+		return $this->image;
+
 	}
 
 	public function resizeToWidth($w,$skip_small=1){
 
 		if($skip_small && $this->width<=$w){
-			return;
+			return $this->image;
 		}
 		else{
 			$ratio = $this->width/$w;
@@ -102,12 +106,14 @@ class imageResizer{
 			$this->resize($new_width,$this->height);
 		}
 
+		return $this->image;
+
 	}
 
 	public function resizeToHeightWidth($w,$h,$skip_small=1){
 
 		if($skip_small && $this->width<=$w && $this->height<=$h){
-			return;
+			return $this->image;
 		}
 		else{
 			$ratio = max($this->width/$w,$this->height/$h);
@@ -116,6 +122,8 @@ class imageResizer{
 
 			$this->resize($new_width,$new_height);
 		}
+
+		return $this->image;
 
 	}
 
