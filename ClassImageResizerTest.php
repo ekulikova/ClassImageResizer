@@ -19,9 +19,9 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 
   public function setUp() {
         register_shutdown_function(function() {
-          foreach ($this->tmp_files as $value) {
-            if(file_exists($value)) {
-                unlink($value);
+          foreach ($this->tmp_files as $file) {
+            if(file_exists($file)) {
+                unlink($file);
             }
           }
         });
@@ -60,9 +60,9 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
        $rez=array();
 
        foreach ($this->image_types as $type) {
-         foreach($data as $set){
-           array_unshift($set,$type);
-           array_push($rez,$set);
+         foreach($data as $param){
+           $param['type'] = $type;
+           array_push($rez,array($param));
          }
        }
 
@@ -127,27 +127,25 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
        * @dataProvider providerResize
        */
 
-      public function testResize($type, $orig_height, $new_height, $orig_width, $new_width){
+      public function testResize($param){
 
-        $image = $this->createImage($orig_width, $orig_height, $type);
+        $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
         $resize = new imageResizer($image);
 
-        $new_image=$resize->resize($new_width,$new_height);
+        $new_image=$resize->resize($param['width']['new'],$param['height']['new']);
 
-        $this->assertEquals($new_width, imagesx($new_image));
-        $this->assertEquals($new_height, imagesy($new_image));
+        $this->assertEquals($param['width']['new'], imagesx($new_image));
+        $this->assertEquals($param['height']['new'], imagesy($new_image));
 
       }
 
       public function providerResize()
        {
-         // data [orig_height,new_height,orig_width,new_width]
-         $data=array(
-                 [200,100,100,80],
-                 [100,150,100,150],
-                 [100,50,200,120]
-             );
-
+         $data = array(
+           array('height'=>['orig'=>200, 'new'=>100],'width'=>['orig'=>100, 'new'=>80]),
+           array('height'=>['orig'=>100, 'new'=>150],'width'=>['orig'=>100, 'new'=>150]),
+           array('height'=>['orig'=>100, 'new'=>50],'width'=>['orig'=>200, 'new'=>120]),
+         );
          return $this->addTypesToData($data);
 
        }
@@ -156,25 +154,25 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
        * @dataProvider providerResizeToHeight
        */
 
-      public function testResizeToHeight($type, $orig_height,$height,$skip_small,$new_height){
+      public function testResizeToHeight($param){
 
-        $image = $this->createImage(200, $orig_height, $type);
+        $image = $this->createImage(200, $param['height']['orig'], $param['type']);
         $resize = new imageResizer($image);
 
-        $new_image=$resize->resizeToHeight($height,$skip_small);
+        $new_image=$resize->resizeToHeight($param['height']['set_value'],$param['skip_small']);
 
         $this->assertEquals(200, imagesx($new_image));
-        $this->assertEquals($new_height, imagesy($new_image));
+        $this->assertEquals($param['height']['new'], imagesy($new_image));
 
       }
 
       public function providerResizeToHeight()
        {
-         // data [orig_height,height,skip_small,new_height]
+
          $data=array(
-                 [100,60,1,60],
-                 [100,150,1,100],
-                 [100,130,0,130]
+                  array('height'=>['orig'=>100,'set_value'=>60,'new'=>60],'skip_small'=>1),
+                  array('height'=>['orig'=>100,'set_value'=>150,'new'=>100],'skip_small'=>1),
+                  array('height'=>['orig'=>100,'set_value'=>130,'new'=>130],'skip_small'=>0),
              );
 
          return $this->addTypesToData($data);
@@ -185,25 +183,25 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
         * @dataProvider providerResizeToWidth
         */
 
-       public function testResizeToWidth($type, $orig_width,$width,$skip_small,$new_width){
+       public function testResizeToWidth($param){
 
-         $image = $this->createImage($orig_width, 200, $type);
+         $image = $this->createImage($param['width']['orig'], 200, $param['type']);
          $resize = new imageResizer($image);
 
-         $new_image=$resize->resizeToWidth($width,$skip_small);
+         $new_image=$resize->resizeToWidth($param['width']['set_value'],$param['skip_small']);
 
-         $this->assertEquals($new_width, imagesx($new_image));
+         $this->assertEquals($param['width']['new'], imagesx($new_image));
          $this->assertEquals(200, imagesy($new_image));
 
        }
 
        public function providerResizeToWidth()
         {
-          // data [orig_width,width,skip_small,new_width]
+
           $data=array(
-                  [100,60,1,60],
-                  [100,150,1,100],
-                  [100,130,0,130]
+                   array('width'=>['orig'=>100,'set_value'=>60,'new'=>60],'skip_small'=>1),
+                   array('width'=>['orig'=>100,'set_value'=>150,'new'=>100],'skip_small'=>1),
+                   array('width'=>['orig'=>100,'set_value'=>130,'new'=>130],'skip_small'=>0),
               );
 
           return $this->addTypesToData($data);
@@ -214,25 +212,31 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
          * @dataProvider providerResizeToHeightWidth
          */
 
-        public function testResizeToHeightWidth($type,$orig_width,$orig_height,$width,$height,$skip_small,$new_width,$new_height){
+        public function testResizeToHeightWidth($param){
 
-          $image = $this->createImage($orig_width, 200, $type);
+          $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
           $resize = new imageResizer($image);
 
-          $new_image=$resize->resizeToWidth($width,$skip_small);
+          $new_image=$resize->resizeToHeightWidth($param['width']['set_value'],$param['height']['set_value'],$param['skip_small']);
 
-          $this->assertEquals($new_width, imagesx($new_image));
-          $this->assertEquals(200, imagesy($new_image));
+          $this->assertEquals($param['width']['new'], imagesx($new_image));
+          $this->assertEquals($param['height']['new'], imagesy($new_image));
 
         }
 
         public function providerResizeToHeightWidth()
          {
-           // data [orig_width, orig_height,width, height,skip_small,new_width,new_height]
+
            $data=array(
-                   [200,500,100,280,1,100,250],
-                   [100,150,100,250,1,100,150],
-                   [100,150,200,330,0,200,300]
+                      array('width'=>['orig'=>200,'set_value'=>100,'new'=>100],
+                            'height'=>['orig'=>500,'set_value'=>280,'new'=>250],
+                            'skip_small'=>1),
+                      array('width'=>['orig'=>100,'set_value'=>100,'new'=>100],
+                            'height'=>['orig'=>150,'set_value'=>250,'new'=>150],
+                            'skip_small'=>1),
+                      array('width'=>['orig'=>100,'set_value'=>200,'new'=>200],
+                            'height'=>['orig'=>150,'set_value'=>330,'new'=>300],
+                            'skip_small'=>0),
                );
 
            return $this->addTypesToData($data);
