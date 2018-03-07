@@ -1,5 +1,5 @@
 <?php
-//namespace ImageResizer;
+namespace EKulikova;
 
 class ImageResizer{
 	private $image;

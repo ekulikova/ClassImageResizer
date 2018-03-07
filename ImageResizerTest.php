@@ -2,6 +2,10 @@
 
 require_once 'ImageResizer.php';
 
+use EKulikova\ImageResizer;
+use EKulikova\ImageResizerException;
+
+
 if (version_compare(PHP_VERSION, '7.0.0') >= 0 && !class_exists('PHPUnit_Framework_TestCase')) {
 	class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
 }
@@ -36,7 +40,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	 {
 
 		 if (!in_array($type, $this->image_types)) {
-			 throw new ImageResizeException('Unsupported image type');
+			 throw new ImageResizerException('Unsupported image type');
 		 }
 
 		 $image = imagecreatetruecolor($width, $height);
@@ -86,7 +90,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 		$image = $this->createImage(1, 1, $type);
 		$resize = new ImageResizer($image);
 
-		$this->assertInstanceOf('ImageResizer', $resize);
+		$this->assertInstanceOf('\EKulikova\ImageResizer', $resize);
 
 	}
 
@@ -107,7 +111,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	 */
 
 	 /**
-	  * @expectedException ImageResizerException
+	  * @expectedException \EKulikova\ImageResizerException
 	  * @expectedExceptionMessage File noFile.gif does not exist
 	  */
 	 public function testLoadNoFile()
@@ -116,7 +120,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	 }
 
 	 /**
-	  * @expectedException ImageResizerException
+	  * @expectedException \EKulikova\ImageResizerException
 	  * @expectedExceptionMessage File ImageResizer.php is not an image
 	  */
 	 public function testLoadNoImage()
