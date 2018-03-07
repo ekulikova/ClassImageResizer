@@ -1,7 +1,7 @@
 <?php
 //namespace ImageResizer;
 
-class imageResizer{
+class ImageResizer{
 	private $image;
 	private $source;
 	private $width;

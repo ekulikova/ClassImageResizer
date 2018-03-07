@@ -1,12 +1,12 @@
 <?php
 
-require_once 'ClassImageResizer.php';
+require_once 'ImageResizer.php';
 
 if (version_compare(PHP_VERSION, '7.0.0') >= 0 && !class_exists('PHPUnit_Framework_TestCase')) {
 	class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
 }
 
-class imageResizerTest extends PHPUnit_Framework_TestCase
+class ImageResizerTest extends PHPUnit_Framework_TestCase
 {
 
 	private $image_types = array(
@@ -84,9 +84,9 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 	{
 
 		$image = $this->createImage(1, 1, $type);
-		$resize = new imageResizer($image);
+		$resize = new ImageResizer($image);
 
-		$this->assertInstanceOf('imageResizer', $resize);
+		$this->assertInstanceOf('ImageResizer', $resize);
 
 	}
 
@@ -112,16 +112,16 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 	  */
 	 public function testLoadNoFile()
 	 {
-		 new imageResizer('noFile.gif');
+		 new ImageResizer('noFile.gif');
 	 }
 
 	 /**
 	  * @expectedException ImageResizerException
-	  * @expectedExceptionMessage File ClassImageResizer.php is not an image
+	  * @expectedExceptionMessage File ImageResizer.php is not an image
 	  */
 	 public function testLoadNoImage()
 	 {
-		 new imageResizer('ClassImageResizer.php');
+		 new ImageResizer('ImageResizer.php');
 	 }
 
 	 /**
@@ -135,7 +135,7 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 	  public function testResize($param){
 
 		  $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
-		  $resize = new imageResizer($image);
+		  $resize = new ImageResizer($image);
 
 		  $new_image=$resize->resize($param['width']['new'],$param['height']['new']);
 
@@ -164,7 +164,7 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 	   public function testResizeToHeight($param){
 
 		   $image = $this->createImage(200, $param['height']['orig'], $param['type']);
-		   $resize = new imageResizer($image);
+		   $resize = new ImageResizer($image);
 
 		   $new_image=$resize->resizeToHeight($param['height']['set_value'],$param['skip_small']);
 
@@ -191,7 +191,7 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 		public function testResizeToWidth($param){
 
 			$image = $this->createImage($param['width']['orig'], 200, $param['type']);
-			$resize = new imageResizer($image);
+			$resize = new ImageResizer($image);
 
 			$new_image=$resize->resizeToWidth($param['width']['set_value'],$param['skip_small']);
 
@@ -219,7 +219,7 @@ class imageResizerTest extends PHPUnit_Framework_TestCase
 		 public function testResizeToHeightWidth($param){
 
 			 $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
-			 $resize = new imageResizer($image);
+			 $resize = new ImageResizer($image);
 
 			 $new_image=$resize->resizeToHeightWidth($param['width']['set_value'],$param['height']['set_value'],$param['skip_small']);
 
