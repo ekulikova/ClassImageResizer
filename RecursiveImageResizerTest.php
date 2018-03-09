@@ -102,6 +102,8 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
       }
 
+			return $this->structure['dirs'][0];
+
    }
 
 	 private function destroyStructure(){
@@ -132,12 +134,12 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
       $dir = $this->createStructure(3, 2);
 
-      /*$rec = new RecursiveImageResizer($dir);
+      $rec = new RecursiveImageResizer( $dir );
 
       $images = $rec->getImages(0);
 
-      $this->assertEquals( count($images) ,6 );
-*/
+      $this->assertEquals( count($images) ,2 );
+
 
 			$this->destroyStructure();
    }
