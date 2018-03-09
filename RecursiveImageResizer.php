@@ -4,7 +4,6 @@ namespace EKulikova;
 require_once 'ImageResizer.php';
 
 use EKulikova\ImageResizer;
-use \DirectoryIterator;
 
 
 class RecursiveImageResizer{
@@ -18,16 +17,22 @@ class RecursiveImageResizer{
 
     public function getImages($recursive){
 
-        foreach ( new DirectoryIterator( $this->dir ) as $fileInfo ) {
+      $directory = new \RecursiveDirectoryIterator( $this->dir );
+      $iterator = new \RecursiveIteratorIterator( $directory );
 
-          if( $fileInfo->isDir() || $fileInfo->isDot()  ) continue;
+      foreach ($iterator as $fileInfo) {
 
-          echo $fileInfo->getFilename() . "\n";
+        if( $fileInfo->getType() == 'file'  ) {
+
+          echo $fileInfo->getPathname() . "\n";
           $this->images[] = $fileInfo->getFilename();
 
         }
 
+      }
+
         return $this->images;
+
     }
 
 /*    public function resize($new_width, $new_height, $recursive=1){

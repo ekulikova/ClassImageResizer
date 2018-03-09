@@ -22,6 +22,14 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 	private $orig_height = 500;
 	private $img_type = 'jpeg';
 
+	protected function setUp(){
+			$this->createStructure(3, 2);
+	}
+
+	protected function tearDown(){
+			$this->destroyStructure();
+	}
+
   /**
 	 * Helpers
 	 */
@@ -132,16 +140,12 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
    public function testGetImages(){
 
-      $dir = $this->createStructure(3, 2);
+      $rec = new RecursiveImageResizer( $this->structure['dirs'][0] );
 
-      $rec = new RecursiveImageResizer( $dir );
+      $images = $rec->getImages(1);
 
-      $images = $rec->getImages(0);
+      $this->assertEquals( count($images) ,6 );
 
-      $this->assertEquals( count($images) ,2 );
-
-
-			$this->destroyStructure();
    }
 
   /**
