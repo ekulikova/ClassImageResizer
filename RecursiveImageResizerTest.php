@@ -91,7 +91,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
    private function createStructure($depth, $quantity){
 
       for($i = 1; $i <= $depth; $i++){
-        
+
 				$dirName = $this->getDirName($i);
 
 				if ( $this->createDir( $dirName ) ){
@@ -106,14 +106,21 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 private function destroyStructure(){
 
-		 	// foreach delete all files
+		 	foreach ( $this->structure['files'] as $file ) {
 
-			//foreach delete all dirs
+				unlink($file);
+
+			}
+
+			$this->structure['files'] = [];
+
 			foreach( array_reverse( $this->structure['dirs'] ) as $dir ){
 
 					rmdir($dir);
 
 			}
+
+			$this->structure['dirs'] = [];
 
 	 }
 
@@ -132,9 +139,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
       $this->assertEquals( count($images) ,6 );
 */
 
-var_dump ($this->structure);
-
-			//$this->destroyStructure();
+			$this->destroyStructure();
    }
 
   /**
