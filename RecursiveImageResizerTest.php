@@ -96,6 +96,16 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 }
 
+	 private function createTxtFile( $dirName ){
+
+		 	$fileName = $this->getTempFile( $dirName );
+			file_put_contents( $fileName,'text file' );
+			$this->structure['files'][] = $fileName;
+
+			return $fileName;
+
+	 }
+
    private function createStructure($depth, $quantity){
 
       for($i = 1; $i <= $depth; $i++){
@@ -104,7 +114,8 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 				if ( $this->createDir( $dirName ) ){
 
-					$this->createImages($dirName, $quantity);
+					$this->createImages( $dirName, $quantity );
+					$this->createTxtFile( $dirName );
 
 				}
 
@@ -144,7 +155,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
       $images = $rec->getImages(1);
 
-      $this->assertEquals( count($images) ,6 );
+      $this->assertEquals( count($images) ,9 );
 
    }
 
