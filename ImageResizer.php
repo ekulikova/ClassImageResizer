@@ -6,12 +6,13 @@ class ImageResizer{
 	private $source;
 	private $width;
 	private $height;
+	private $MIMEtype;
 	private $type;
 
 	private $properTypes = [
-		'IMAGETYPE_JPEG' => 'jpeg',
-		'IMAGETYPE_GIF' => 'gif',
-		'IMAGETYPE_PNG' => 'png',
+		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_GIF => 'gif',
+		IMAGETYPE_PNG => 'png',
 	];
 
 
@@ -19,33 +20,9 @@ class ImageResizer{
 
 		$this -> setSource($source);
 
-		$this -> setSize();
+		$this -> setImageInfo();
 
-		$this -> setType();
-
-		/*if ( array_key_exists( $this->type, $this->properTypes ) ) {
-
-				$this -> createImage();
-
-		} else {
-
-				throw new ImageResizerException('Unsupported image type. File '.$source);
-
-		}*/
-
-		if( $this->type == IMAGETYPE_JPEG ) {
-			$this->image = imagecreatefromjpeg($source);
-		} elseif( $this->type == IMAGETYPE_GIF ) {
-			$this->image = imagecreatefromgif($source);
-		} elseif( $this->type == IMAGETYPE_PNG ) {
-			$this->image = imagecreatefrompng($source);
-		} else {
-				throw new ImageResizerException('Unsupported image type. File '.$source);
-		}
-
-		if (!$this->image) {
-            throw new ImageResizerException('Could not load image from '.$source);
-        }
+		$this -> createImage();
 
 	}
 
@@ -63,29 +40,37 @@ class ImageResizer{
 
 	}
 
-	private function setSize(){
+	private function setImageInfo(){
 
-		list($this->width, $this->height) = getimagesize($this->source);
+		list($this->width, $this->height, $this->MIMEtype) = getimagesize($this->source);
 
 		if(!$this->width || !$this->height){
 			throw new ImageResizerException('File '.$this->source.' is not an image');
 		}
 
+		if ( array_key_exists( $this->MIMEtype, $this->properTypes ) ) {
+
+				$this->type = $this->properTypes[$this->MIMEtype];
+
+		} else {
+
+				throw new ImageResizerException('Unsupported image type. File '.$this->source);
+
+		}
+
 	}
 
-	private function setType(){
+	private function createImage(){
 
-		$this->type = exif_imagetype($this->source);
+			$createFunction = 'imagecreatefrom'.$this->type;
 
-		
+			$this->image = $createFunction( $this->source );
+
+			if (!$this->image) {
+	        throw new ImageResizerException('Could not load image from '.$this->source);
+	    }
 
 	}
-
-	/*private function createImage(){
-
-			$createFunction = 'imagecreatefrom'.
-
-	}*/
 
 	private function update($new_image){
 
@@ -105,6 +90,8 @@ class ImageResizer{
 			imagegif($this->image,$filename);
 		} elseif( $this->type == IMAGETYPE_PNG ) {
 			imagepng($this->image,$filename);
+		} else {
+			throw new ImageResizerException('Could not save file '.$filename);
 		}
 
 		if($permissions) {
