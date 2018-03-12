@@ -19,11 +19,9 @@ class ImageResizer{
 
 		$this -> setSource($source);
 
-		list($this->width, $this->height, $this->type) = getimagesize($this->source);
+		$this -> setSize();
 
-		if(!$this->width || !$this->height){
-			throw new ImageResizerException('File '.$this->source.' is not an image');
-		}
+		$this -> setType();
 
 		/*if ( array_key_exists( $this->type, $this->properTypes ) ) {
 
@@ -62,6 +60,24 @@ class ImageResizer{
 			}
 
 			$this->source=$source;
+
+	}
+
+	private function setSize(){
+
+		list($this->width, $this->height) = getimagesize($this->source);
+
+		if(!$this->width || !$this->height){
+			throw new ImageResizerException('File '.$this->source.' is not an image');
+		}
+
+	}
+
+	private function setType(){
+
+		$this->type = exif_imagetype($this->source);
+
+		
 
 	}
 
