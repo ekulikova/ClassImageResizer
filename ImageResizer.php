@@ -8,19 +8,32 @@ class ImageResizer{
 	private $height;
 	private $type;
 
+	private $properTypes = [
+		'IMAGETYPE_JPEG' => 'jpeg',
+		'IMAGETYPE_GIF' => 'gif',
+		'IMAGETYPE_PNG' => 'png',
+	];
+
 
 	public function __construct($source){
 
-		 if (!is_file($source)) {
-            throw new ImageResizerException('File '.$source.' does not exist');
-        }
+		$this -> setSource($source);
 
-		$this->source=$source;
-		list($this->width, $this->height, $this->type) = getimagesize($source);
+		list($this->width, $this->height, $this->type) = getimagesize($this->source);
 
 		if(!$this->width || !$this->height){
-			throw new ImageResizerException('File '.$source.' is not an image');
+			throw new ImageResizerException('File '.$this->source.' is not an image');
 		}
+
+		/*if ( array_key_exists( $this->type, $this->properTypes ) ) {
+
+				$this -> createImage();
+
+		} else {
+
+				throw new ImageResizerException('Unsupported image type. File '.$source);
+
+		}*/
 
 		if( $this->type == IMAGETYPE_JPEG ) {
 			$this->image = imagecreatefromjpeg($source);
@@ -29,7 +42,7 @@ class ImageResizer{
 		} elseif( $this->type == IMAGETYPE_PNG ) {
 			$this->image = imagecreatefrompng($source);
 		} else {
-			throw new ImageResizerException('Unsupported image type. File '.$source);
+				throw new ImageResizerException('Unsupported image type. File '.$source);
 		}
 
 		if (!$this->image) {
@@ -41,6 +54,22 @@ class ImageResizer{
 	public function __destruct(){
 		imagedestroy($this->image);
 	}
+
+	private function setSource($source){
+
+			if (!is_file($source)) {
+					 throw new ImageResizerException('File '.$source.' does not exist');
+			}
+
+			$this->source=$source;
+
+	}
+
+	/*private function createImage(){
+
+			$createFunction = 'imagecreatefrom'.
+
+	}*/
 
 	private function update($new_image){
 
