@@ -80,15 +80,15 @@ class ImageResizer{
 
 	}
 
-	private function save($filename,$compression=75,$permissions=0777){
+	public function save($filename, $permissions=0777, $compression=75){
 
 		$filename or $filename=$this->source;
 
-		if( $this->type == IMAGETYPE_JPEG ) {
+		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
 			imagejpeg($this->image,$filename,$compression);
-		} elseif( $this->type == IMAGETYPE_GIF ) {
+		} elseif( $this->MIMEtype == IMAGETYPE_GIF ) {
 			imagegif($this->image,$filename);
-		} elseif( $this->type == IMAGETYPE_PNG ) {
+		} elseif( $this->MIMEtype == IMAGETYPE_PNG ) {
 			imagepng($this->image,$filename);
 		} else {
 			throw new ImageResizerException('Could not save file '.$filename);
