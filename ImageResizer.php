@@ -80,9 +80,7 @@ class ImageResizer{
 
 	}
 
-	public function save($filename, $permissions=0777, $compression=75){
-
-		$filename or $filename=$this->source;
+	public function imageOutput($filename, $compression){
 
 		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
 			imagejpeg($this->image,$filename,$compression);
@@ -91,8 +89,18 @@ class ImageResizer{
 		} elseif( $this->MIMEtype == IMAGETYPE_PNG ) {
 			imagepng($this->image,$filename);
 		} else {
-			throw new ImageResizerException('Could not save file '.$filename);
+			throw new ImageResizerException('Could not output image '.$this->source);
 		}
+
+		return $this->image;
+
+	}
+
+	public function save($filename, $permissions=0777, $compression=75){
+
+		$filename or $filename=$this->source;
+
+		$this -> imageOutput($filename, $compression);
 
 		if($permissions) {
 			chmod($filename,$permissions);

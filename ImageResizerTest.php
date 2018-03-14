@@ -251,7 +251,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 		 }
 
 		 /**
-	 * Save and Output tests
+	 * Save and Output functions test
 	 */
 
 	 public function testSave(){
