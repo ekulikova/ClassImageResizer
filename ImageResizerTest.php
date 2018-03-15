@@ -250,4 +250,26 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 
 		 }
 
+		 /**
+	 * Save and Output functions test
+	 */
+
+	 public function testSave(){
+
+			$image = $this->createImage(500, 500, 'gif');
+
+			$resize = new ImageResizer($image);
+			$resize->resize(100,100);
+
+			$filename = $this->getTempFile();
+			$resize->save( $filename );
+
+			list($width, $height, $type) = getimagesize( $filename );
+
+			$this->assertEquals(100, $width);
+			$this->assertEquals(100, $height);
+			$this->assertEquals(IMAGETYPE_GIF, $type);
+
+	 }
+
 }

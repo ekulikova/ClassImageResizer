@@ -6,40 +6,70 @@ class ImageResizer{
 	private $source;
 	private $width;
 	private $height;
+	private $MIMEtype;
 	private $type;
+
+	private $properTypes = [
+		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_GIF => 'gif',
+		IMAGETYPE_PNG => 'png',
+	];
 
 
 	public function __construct($source){
 
-		 if (!is_file($source)) {
-            throw new ImageResizerException('File '.$source.' does not exist');
-        }
+		$this -> setSource($source);
 
-		$this->source=$source;
-		list($this->width, $this->height, $this->type) = getimagesize($source);
+		$this -> setImageInfo();
 
-		if(!$this->width || !$this->height){
-			throw new ImageResizerException('File '.$source.' is not an image');
-		}
-
-		if( $this->type == IMAGETYPE_JPEG ) {
-			$this->image = imagecreatefromjpeg($source);
-		} elseif( $this->type == IMAGETYPE_GIF ) {
-			$this->image = imagecreatefromgif($source);
-		} elseif( $this->type == IMAGETYPE_PNG ) {
-			$this->image = imagecreatefrompng($source);
-		} else {
-			throw new ImageResizerException('Unsupported image type. File '.$source);
-		}
-
-		if (!$this->image) {
-            throw new ImageResizerException('Could not load image from '.$source);
-        }
+		$this -> createImage();
 
 	}
 
 	public function __destruct(){
 		imagedestroy($this->image);
+	}
+
+	private function setSource($source){
+
+			if (!is_file($source)) {
+					 throw new ImageResizerException('File '.$source.' does not exist');
+			}
+
+			$this->source=$source;
+
+	}
+
+	private function setImageInfo(){
+
+		list($this->width, $this->height, $this->MIMEtype) = getimagesize($this->source);
+
+		if(!$this->width || !$this->height){
+			throw new ImageResizerException('File '.$this->source.' is not an image');
+		}
+
+		if ( array_key_exists( $this->MIMEtype, $this->properTypes ) ) {
+
+				$this->type = $this->properTypes[$this->MIMEtype];
+
+		} else {
+
+				throw new ImageResizerException('Unsupported image type. File '.$this->source);
+
+		}
+
+	}
+
+	private function createImage(){
+
+			$createFunction = 'imagecreatefrom'.$this->type;
+
+			$this->image = $createFunction( $this->source );
+
+			if (!$this->image) {
+	        throw new ImageResizerException('Could not load image from '.$this->source);
+	    }
+
 	}
 
 	private function update($new_image){
@@ -50,17 +80,27 @@ class ImageResizer{
 
 	}
 
-	private function save($filename,$compression=75,$permissions=0777){
+	public function imageOutput($filename, $compression){
+
+		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
+			imagejpeg($this->image,$filename,$compression);
+		} elseif( $this->MIMEtype == IMAGETYPE_GIF ) {
+			imagegif($this->image,$filename);
+		} elseif( $this->MIMEtype == IMAGETYPE_PNG ) {
+			imagepng($this->image,$filename);
+		} else {
+			throw new ImageResizerException('Could not output image '.$this->source);
+		}
+
+		return $this->image;
+
+	}
+
+	public function save($filename, $permissions=0777, $compression=75){
 
 		$filename or $filename=$this->source;
 
-		if( $this->type == IMAGETYPE_JPEG ) {
-			imagejpeg($this->image,$filename,$compression);
-		} elseif( $this->type == IMAGETYPE_GIF ) {
-			imagegif($this->image,$filename);
-		} elseif( $this->type == IMAGETYPE_PNG ) {
-			imagepng($this->image,$filename);
-		}
+		$this -> imageOutput($filename, $compression);
 
 		if($permissions) {
 			chmod($filename,$permissions);
