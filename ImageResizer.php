@@ -96,7 +96,7 @@ class ImageResizer{
 
 	}
 
-	public function save($filename, $permissions=0777, $compression=75){
+	public function save($filename=null, $permissions=0777, $compression=75){
 
 		$filename or $filename=$this->source;
 

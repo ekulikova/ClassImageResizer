@@ -40,16 +40,20 @@ class RecursiveImageResizer{
 
     }
 
-/*    public function resize($new_width, $new_height, $recursive=1){
+    public function resize($new_width, $new_height, $recursive=1){
 
         $images = $this->getImages($recursive);
 
-        // foreach and resize
+        foreach ($images as $image) {
 
-        retrurn count($images);
+            $img = new imageResizer($image);
+            $img -> resize($new_width, $new_height);
+            $img -> save();
+
+        }
 
     }
-*/
+
 }
 
 class RecursiveImageResizerException extends \Exception
