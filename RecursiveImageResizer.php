@@ -22,10 +22,15 @@ class RecursiveImageResizer{
 
       foreach ($iterator as $fileInfo) {
 
-        if( $fileInfo->getType() == 'file'  ) {
+        if( $fileInfo->isFile() ) {
 
-          echo $fileInfo->getPathname() . "\n";
-          $this->images[] = $fileInfo->getFilename();
+          $fileName = $fileInfo->getPathname();
+
+          if( @exif_imagetype( $fileName ) ){
+
+              $this->images[] = $fileName;
+
+          }
 
         }
 

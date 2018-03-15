@@ -155,7 +155,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
       $images = $rec->getImages(1);
 
-      $this->assertEquals( count($images) ,9 );
+      $this->assertEquals( count($images) ,6 );
 
    }
 
