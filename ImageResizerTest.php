@@ -21,15 +21,18 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 
 	private $tmp_files = array();
 
-	public function setUp() {
+	protected function tearDown(){
+			$this->destroyImages();
+	}
 
-		register_shutdown_function(function() {
-			foreach ($this->tmp_files as $file) {
-				if(file_exists($file)) {
-					unlink($file);
-				}
+	private function destroyImages(){
+
+		foreach ($this->tmp_files as $file) {
+			if(file_exists($file)) {
+				unlink($file);
 			}
-		});
+		}
+
 	}
 
 	/**
