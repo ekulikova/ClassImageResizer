@@ -151,15 +151,27 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
    * Tests
    */
 
-   public function testGetImages(){
+	 /**
+     * @dataProvider getImagesProvider
+     */
+
+   public function testGetImages($recursive, $expected){
 
       $rec = new RecursiveImageResizer( $this->testDir );
 
-      $images = $rec->getImages(1);
+      $images = $rec->getImages($recursive);
 
-      $this->assertEquals( count($images) ,6 );
+      $this->assertEquals( count($images) ,$expected );
 
    }
+
+	 public function getImagesProvider()
+    {
+        return [
+            [1, 6],
+            [0, 2],
+        ];
+    }
 
   /**
   * Resize tests
@@ -169,7 +181,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
       $rec = new RecursiveImageResizer($this -> testDir);
 
-      $rec->resize(100, 100, 0);
+      $rec->resize(100, 100, 1);
 
 			$images = $rec->getImages(1);
 
@@ -180,7 +192,55 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 				$this->assertEquals(100, $height);
 
 			}
+  }
 
+	public function testResizeToHeight(){
+
+      $rec = new RecursiveImageResizer($this -> testDir);
+
+      $rec->resizeToHeight(100, 1, 1);
+
+			$images = $rec->getImages(1);
+
+			foreach ( $images as $img ) {
+
+				list( $width, $height ) = getimagesize( $img );
+				$this->assertEquals(100, $height);
+
+			}
+  }
+
+	public function testResizeToWidth(){
+
+      $rec = new RecursiveImageResizer($this -> testDir);
+
+      $rec->resizeToWidth(100, 1, 1);
+
+			$images = $rec->getImages(1);
+
+			foreach ( $images as $img ) {
+
+				list( $width, $height ) = getimagesize( $img );
+				$this->assertEquals(100, $width);
+
+			}
+  }
+
+	public function testResizeToHeightWidth(){
+
+      $rec = new RecursiveImageResizer($this -> testDir);
+
+      $rec->resizeToHeightWidth(100, 100, 1, 1);
+
+			$images = $rec->getImages(1);
+
+			foreach ( $images as $img ) {
+
+				list( $width, $height ) = getimagesize( $img );
+				$this->assertEquals(100, $width);
+				$this->assertEquals(100, $height);
+
+			}
   }
 
 }
