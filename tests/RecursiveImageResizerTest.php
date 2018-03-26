@@ -1,6 +1,6 @@
 <?php
 
-require_once 'RecursiveImageResizer.php';
+require_once __DIR__.'/../lib/RecursiveImageResizer.php';
 
 use EKulikova\RecursiveImageResizer;
 use EKulikova\RecursiveImageResizerException;

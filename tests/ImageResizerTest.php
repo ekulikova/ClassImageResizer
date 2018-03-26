@@ -1,6 +1,6 @@
 <?php
 
-require_once 'ImageResizer.php';
+require_once __DIR__.'/../lib/ImageResizer.php';
 
 use EKulikova\ImageResizer;
 use EKulikova\ImageResizerException;
@@ -124,11 +124,11 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 /**
 	  * @expectedException \EKulikova\ImageResizerException
-	  * @expectedExceptionMessage File ImageResizer.php is not an image
+	  * @expectedExceptionMessage is not an image
 	  */
 	 public function testLoadNoImage()
 	 {
-		 new ImageResizer('ImageResizer.php');
+		 new ImageResizer(__FILE__);
 	 }
 
 	 /**

@@ -15,6 +15,16 @@ class RecursiveImageResizer{
         $this->dir = $dir;
     }
 
+    private function addImage($fileName){
+
+      if( @exif_imagetype( $fileName ) ){
+
+          $this->images[] = $fileName;
+
+      }
+
+    }
+
     private function getImagesRecursive(){
 
       $directory = new \RecursiveDirectoryIterator( $this->dir );
@@ -25,14 +35,7 @@ class RecursiveImageResizer{
         if( $fileInfo->isFile() ) {
 
           $fileName = $fileInfo->getPathname();
-
-
-
-          if( @exif_imagetype( $fileName ) ){
-
-              $this->images[] = $fileName;
-
-          }
+          $this->addImage($fileName);
 
         }
 
@@ -48,17 +51,13 @@ class RecursiveImageResizer{
       {
           if ( !$file->isDot()  && !$file->isDir() )
           {
+
             $fileName = $file->getPathname();
-
-            if( @exif_imagetype( $fileName ) ){
-
-                $this->images[] = $fileName;
-
-            }
+            $this->addImage($fileName);
 
           }
       }
-
+      
     }
 
     public function getImages($recursive){
