@@ -1,6 +1,11 @@
 # ImageResizerClass
 
-PHP library to resize images.
+PHP libraries to resize images and bunch of images recursively.
+
+ImageResizer.php is library to resize image in different ways.
+RecursiveImageResizer.php uses the previous library and does the same things recursively.
+
+##ImageResizer.php##
 
 Use this sintax for install the library:
 ```
@@ -51,4 +56,63 @@ $image->save([$file_name]);
 $image = new ImageResizer('image.jpg');
 $image->resizeToWidth($new_width [, $skip_small]);
 $image->save([$file_name]);
+```
+
+###RecursiveImageResizer.php###
+
+Use this sintax for install the library:
+```
+include '/path/to/RecursiveImageResizer.php';
+```
+Because this class uses namespacing, when instantiating the object, you need to either use the fully qualified namespace:
+```
+$dir = new \EKulikova\RecursiveImageResizer();
+```
+Or alias it:
+
+```
+use \EKulikova\RecursiveImageResizer;
+
+$dir = new RecursiveImageResizer();
+```
+> Note:
+This library uses GD class which do not support resizing animated gif files
+
+Resize
+------
+
+At first you can resize directly, without keeping ratio.
+###Images with new dementions overwritten original images###
+The function has optional bollean parameter $recursive to go recursively.
+If $recursive=0 function resizes only images in the directory and doesn't go deeper.
+If $recursive=1 function goes throught all nested directories.
+
+```php
+$rec = new RecursiveImageResizer($dirName);
+$rec->resize($new_width, $new_height[, $recursive]);
+```
+
+To resize an image to best fit a given set of dimensions (keeping aspect ratio)
+###Images with new dementions overwritten original images###
+The function has optional bollean parameter $recursive to go recursively.
+If $recursive=0 function resizes only images in the directory and doesn't go deeper.
+If $recursive=1 function goes throught all nested directories.
+
+```php
+$rec = new RecursiveImageResizer($dirName);
+$rec->resizeToHeightWidth($new_width, $new_height[, $recursive]);
+```
+
+To resize an image according to one dimension (keeping aspect ratio):
+###Images with new dementions overwritten original images###
+The function has optional bollean parameter $recursive to go recursively.
+If $recursive=0 function resizes only images in the directory and doesn't go deeper.
+If $recursive=1 function goes throught all nested directories.
+
+```php
+$rec = new RecursiveImageResizer($dirName);
+$rec->resizeToHeight($new_height[, $recursive]);
+
+$rec = new RecursiveImageResizer($dirName);
+$rec->resizeToWidth($new_width, [, $recursive]);
 ```
