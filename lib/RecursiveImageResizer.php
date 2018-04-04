@@ -2,11 +2,12 @@
 namespace EKulikova;
 
 require_once 'ImageResizer.php';
+require_once 'IResizer.php';
 
 use EKulikova\ImageResizer;
 
 
-class RecursiveImageResizer{
+class RecursiveImageResizer implements iResizer{
 
     private $dir;
     private $recursive;

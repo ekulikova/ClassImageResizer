@@ -1,7 +1,9 @@
 <?php
 namespace EKulikova;
 
-class ImageResizer{
+require_once 'IResizer.php';
+
+class ImageResizer implements iResizer{
 	private $image;
 	private $source;
 	private $width;
