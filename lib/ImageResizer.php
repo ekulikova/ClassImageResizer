@@ -4,19 +4,19 @@ namespace EKulikova;
 require_once 'IResizer.php';
 
 class ImageResizer implements iResizer{
-	private $image;
-	private $originPath;
-	private $width;
-	private $height;
-	private $MIMEtype;
-	private $type;
 
-	private $properTypes = [
+	const PROPER_TYPES = [
 		IMAGETYPE_JPEG => 'jpeg',
 		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_PNG => 'png',
 	];
 
+	private $image;
+	private $originPath;
+	private $width;
+	private $height;
+	private $MIMEtype;
+	private $type; // self::PROPER_TYPES[$this->MIMEtype]
 
 	public function __construct($originPath){
 
@@ -50,9 +50,9 @@ class ImageResizer implements iResizer{
 			throw new ImageResizerException('File '.$this->source.' is not an image');
 		}
 
-		if ( array_key_exists( $this->MIMEtype, $this->properTypes ) ) {
+		if ( array_key_exists( $this->MIMEtype, self::PROPER_TYPES ) ) {
 
-				$this->type = $this->properTypes[$this->MIMEtype];
+				$this->type = self::PROPER_TYPES[$this->MIMEtype];
 
 		} else {
 
