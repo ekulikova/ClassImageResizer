@@ -35,19 +35,19 @@ class ImageResizer implements iResizer{
 	private function setOriginPath($originPath){
 
 			if (!is_file($originPath)) {
-					 throw new ImageResizerException('File '.$originPath.' does not exist');
+					 throw new ImageResizerException($originPath.' is not a file or does not exist.');
 			}
 
-			$this->source=$originPath;
+			$this->originPath=$originPath;
 
 	}
 
 	private function setImageInfo(){
 
-		list($this->width, $this->height, $this->MIMEtype) = getimagesize($this->source);
+		list($this->width, $this->height, $this->MIMEtype) = getimagesize($this->originPath);
 
 		if(!$this->width || !$this->height){
-			throw new ImageResizerException('File '.$this->source.' is not an image');
+			throw new ImageResizerException('File '.$this->originPath.' is not an image');
 		}
 
 		if ( array_key_exists( $this->MIMEtype, self::PROPER_TYPES ) ) {
@@ -56,7 +56,7 @@ class ImageResizer implements iResizer{
 
 		} else {
 
-				throw new ImageResizerException('Unsupported image type. File '.$this->source);
+				throw new ImageResizerException('Unsupported image type. File '.$this->originPath);
 
 		}
 
@@ -66,10 +66,10 @@ class ImageResizer implements iResizer{
 
 			$createFunction = 'imagecreatefrom'.$this->type;
 
-			$this->image = $createFunction( $this->source );
+			$this->image = $createFunction( $this->originPath );
 
 			if (!$this->image) {
-	        throw new ImageResizerException('Could not load image from '.$this->source);
+	        throw new ImageResizerException('Could not load image from '.$this->originPath);
 	    }
 
 	}
@@ -82,7 +82,7 @@ class ImageResizer implements iResizer{
 
 	}
 
-	public function imageOutput($filename, $compression){
+	public function imageOutput($filename, $compression=75){
 
 		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
 			imagejpeg($this->image,$filename,$compression);
@@ -91,7 +91,7 @@ class ImageResizer implements iResizer{
 		} elseif( $this->MIMEtype == IMAGETYPE_PNG ) {
 			imagepng($this->image,$filename);
 		} else {
-			throw new ImageResizerException('Could not output image '.$this->source);
+			throw new ImageResizerException('Could not output image '.$this->originPath);
 		}
 
 		return $this->image;
@@ -100,7 +100,7 @@ class ImageResizer implements iResizer{
 
 	public function save($filename=null, $permissions=0777, $compression=75){
 
-		$filename or $filename=$this->source;
+		$filename or $filename=$this->originPath;
 
 		$this -> imageOutput($filename, $compression);
 
@@ -120,13 +120,13 @@ class ImageResizer implements iResizer{
 
 	}
 
-	public function resizeToHeight($h,$skip_small=1){
+	public function resizeToHeight($new_height,$skip_small=1){
 
-		if($skip_small && $this->height<=$h){
+		if($skip_small && $this->height<=$new_height){
 			return $this->image;
 		}
 		else{
-			$ratio = $this->height/$h;
+			$ratio = $this->height/$new_height;
 			$new_height=$this->height/$ratio;
 
 			$this->resize($this->width,$new_height);
@@ -136,13 +136,13 @@ class ImageResizer implements iResizer{
 
 	}
 
-	public function resizeToWidth($w,$skip_small=1){
+	public function resizeToWidth($new_width,$skip_small=1){
 
-		if($skip_small && $this->width<=$w){
+		if($skip_small && $this->width<=$new_width){
 			return $this->image;
 		}
 		else{
-			$ratio = $this->width/$w;
+			$ratio = $this->width/$new_width;
 			$new_width=$this->width/$ratio;
 
 			$this->resize($new_width,$this->height);
@@ -152,13 +152,13 @@ class ImageResizer implements iResizer{
 
 	}
 
-	public function resizeToHeightWidth($w,$h,$skip_small=1){
+	public function resizeToHeightWidth($new_width,$new_height,$skip_small=1){
 
-		if($skip_small && $this->width<=$w && $this->height<=$h){
+		if($skip_small && $this->width<=$new_width && $this->height<=$new_height){
 			return $this->image;
 		}
 		else{
-			$ratio = max($this->width/$w,$this->height/$h);
+			$ratio = max($this->width/$new_width,$this->height/$new_height);
 			$new_width=$this->width/$ratio;
 			$new_height=$this->height/$ratio;
 

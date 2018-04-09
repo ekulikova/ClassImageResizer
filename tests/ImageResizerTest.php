@@ -115,7 +115,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 /**
 	  * @expectedException \EKulikova\ImageResizerException
-	  * @expectedExceptionMessage File noFile.gif does not exist
+	  * @expectedExceptionMessage noFile.gif is not a file or does not exist.
 	  */
 	 public function testLoadNoFile()
 	 {
