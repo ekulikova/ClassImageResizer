@@ -13,7 +13,7 @@ class RecursiveImageResizer implements iResizer{
     private $recursive;
     private $images;
 
-    public function __construct($dir, $recursive){
+    public function __construct($dir, $recursive=1){
         $this->dir = $dir;
 
         $this->recursive = $recursive;
