@@ -157,9 +157,9 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
    public function testGetImages($recursive, $expected){
 
-      $rec = new RecursiveImageResizer( $this->testDir );
+      $rec = new RecursiveImageResizer( $this->testDir, $recursive );
 
-      $images = $rec->getImages($recursive);
+      $images = $rec->getImages();
 
       $this->assertEquals( count($images) ,$expected );
 
@@ -179,11 +179,11 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
   public function testResize(){
 
-      $rec = new RecursiveImageResizer($this -> testDir);
+      $rec = new RecursiveImageResizer($this -> testDir, 1);
 
-      $rec->resize(100, 100, 1);
+      $rec->resize(100, 100);
 
-			$images = $rec->getImages(1);
+			$images = $rec->getImages();
 
 			foreach ( $images as $img ) {
 
@@ -196,11 +196,11 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	public function testResizeToHeight(){
 
-      $rec = new RecursiveImageResizer($this -> testDir);
+      $rec = new RecursiveImageResizer($this -> testDir, 1);
 
-      $rec->resizeToHeight(100, 1, 1);
+      $rec->resizeToHeight(100, 1);
 
-			$images = $rec->getImages(1);
+			$images = $rec->getImages();
 
 			foreach ( $images as $img ) {
 
@@ -212,11 +212,11 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	public function testResizeToWidth(){
 
-      $rec = new RecursiveImageResizer($this -> testDir);
+      $rec = new RecursiveImageResizer($this -> testDir, 1);
 
-      $rec->resizeToWidth(100, 1, 1);
+      $rec->resizeToWidth(100, 1);
 
-			$images = $rec->getImages(1);
+			$images = $rec->getImages();
 
 			foreach ( $images as $img ) {
 
@@ -228,11 +228,11 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	public function testResizeToHeightWidth(){
 
-      $rec = new RecursiveImageResizer($this -> testDir);
+      $rec = new RecursiveImageResizer($this -> testDir, 1);
 
-      $rec->resizeToHeightWidth(100, 100, 1, 1);
+      $rec->resizeToHeightWidth(100, 100, 1);
 
-			$images = $rec->getImages(1);
+			$images = $rec->getImages();
 
 			foreach ( $images as $img ) {
 

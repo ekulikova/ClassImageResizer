@@ -2,17 +2,21 @@
 namespace EKulikova;
 
 require_once 'ImageResizer.php';
+require_once 'IResizer.php';
 
 use EKulikova\ImageResizer;
 
 
-class RecursiveImageResizer{
+class RecursiveImageResizer implements iResizer{
 
     private $dir;
+    private $recursive;
     private $images;
 
-    public function __construct($dir){
+    public function __construct($dir, $recursive=1){
         $this->dir = $dir;
+
+        $this->recursive = $recursive;
     }
 
     private function addImage($fileName){
@@ -57,12 +61,12 @@ class RecursiveImageResizer{
 
           }
       }
-      
+
     }
 
-    public function getImages($recursive){
+    public function getImages(){
 
-      if( $recursive ){
+      if( $this->recursive ){
           $this->getImagesRecursive();
       }
       else{
@@ -73,9 +77,9 @@ class RecursiveImageResizer{
 
     }
 
-    public function resize($new_width, $new_height, $recursive=1){
+    public function resize($new_width, $new_height){
 
-        $this->getImages($recursive);
+        $this->getImages();
 
         foreach ($this->images as $image) {
 
@@ -86,9 +90,9 @@ class RecursiveImageResizer{
         }
     }
 
-    public function resizeToHeight($new_height, $recursive=1, $skip_small=1){
+    public function resizeToHeight($new_height, $skip_small=1){
 
-        $this->getImages($recursive);
+        $this->getImages();
 
         foreach ($this->images as $image) {
 
@@ -99,9 +103,9 @@ class RecursiveImageResizer{
         }
     }
 
-    public function resizeToWidth($new_width, $recursive=1, $skip_small=1){
+    public function resizeToWidth($new_width, $skip_small=1){
 
-        $this->getImages($recursive);
+        $this->getImages();
 
         foreach ($this->images as $image) {
 
@@ -112,9 +116,9 @@ class RecursiveImageResizer{
         }
     }
 
-    public function resizeToHeightWidth($new_width, $new_height, $recursive=1, $skip_small=1){
+    public function resizeToHeightWidth($new_width, $new_height, $skip_small=1){
 
-        $this->getImages($recursive);
+        $this->getImages();
 
         foreach ($this->images as $image) {
 
