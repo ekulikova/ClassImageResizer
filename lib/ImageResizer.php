@@ -5,7 +5,7 @@ require_once 'IResizer.php';
 
 class ImageResizer implements iResizer{
 	private $image;
-	private $source;
+	private $originPath;
 	private $width;
 	private $height;
 	private $MIMEtype;
@@ -18,9 +18,9 @@ class ImageResizer implements iResizer{
 	];
 
 
-	public function __construct($source){
+	public function __construct($originPath){
 
-		$this -> setSource($source);
+		$this -> setOriginPath($originPath);
 
 		$this -> setImageInfo();
 
@@ -32,13 +32,13 @@ class ImageResizer implements iResizer{
 		imagedestroy($this->image);
 	}
 
-	private function setSource($source){
+	private function setOriginPath($originPath){
 
-			if (!is_file($source)) {
-					 throw new ImageResizerException('File '.$source.' does not exist');
+			if (!is_file($originPath)) {
+					 throw new ImageResizerException('File '.$originPath.' does not exist');
 			}
 
-			$this->source=$source;
+			$this->source=$originPath;
 
 	}
 
