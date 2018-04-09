@@ -11,7 +11,7 @@ class ImageResizer implements iResizer{
 		IMAGETYPE_PNG => 'png',
 	];
 
-	private $image;
+	private $resource;
 	private $originPath;
 	private $width;
 	private $height;
@@ -29,7 +29,7 @@ class ImageResizer implements iResizer{
 	}
 
 	public function __destruct(){
-		imagedestroy($this->image);
+		imagedestroy($this->resource);
 	}
 
 	private function setOriginPath($originPath){
@@ -66,9 +66,9 @@ class ImageResizer implements iResizer{
 
 			$createFunction = 'imagecreatefrom'.$this->type;
 
-			$this->image = $createFunction( $this->source );
+			$this->resource = $createFunction( $this->source );
 
-			if (!$this->image) {
+			if (!$this->resource) {
 	        throw new ImageResizerException('Could not load image from '.$this->source);
 	    }
 
@@ -76,25 +76,25 @@ class ImageResizer implements iResizer{
 
 	private function update($new_image){
 
-		$this->image=$new_image;
-		$this->height=imagesy($this->image);
-		$this->widht=imagesx($this->image);
+		$this->resource=$new_image;
+		$this->height=imagesy($this->resource);
+		$this->widht=imagesx($this->resource);
 
 	}
 
 	public function imageOutput($filename, $compression){
 
 		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
-			imagejpeg($this->image,$filename,$compression);
+			imagejpeg($this->resource,$filename,$compression);
 		} elseif( $this->MIMEtype == IMAGETYPE_GIF ) {
-			imagegif($this->image,$filename);
+			imagegif($this->resource,$filename);
 		} elseif( $this->MIMEtype == IMAGETYPE_PNG ) {
-			imagepng($this->image,$filename);
+			imagepng($this->resource,$filename);
 		} else {
 			throw new ImageResizerException('Could not output image '.$this->source);
 		}
 
-		return $this->image;
+		return $this->resource;
 
 	}
 
@@ -113,17 +113,17 @@ class ImageResizer implements iResizer{
 	public function resize($new_width,$new_height){
 
 		$new_image = imagecreatetruecolor($new_width, $new_height);
-		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height);
+		imagecopyresampled($new_image, $this->resource, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height);
 		$this->update($new_image);
 
-		return $this->image;
+		return $this->resource;
 
 	}
 
 	public function resizeToHeight($h,$skip_small=1){
 
 		if($skip_small && $this->height<=$h){
-			return $this->image;
+			return $this->resource;
 		}
 		else{
 			$ratio = $this->height/$h;
@@ -132,14 +132,14 @@ class ImageResizer implements iResizer{
 			$this->resize($this->width,$new_height);
 		}
 
-		return $this->image;
+		return $this->resource;
 
 	}
 
 	public function resizeToWidth($w,$skip_small=1){
 
 		if($skip_small && $this->width<=$w){
-			return $this->image;
+			return $this->resource;
 		}
 		else{
 			$ratio = $this->width/$w;
@@ -148,14 +148,14 @@ class ImageResizer implements iResizer{
 			$this->resize($new_width,$this->height);
 		}
 
-		return $this->image;
+		return $this->resource;
 
 	}
 
 	public function resizeToHeightWidth($w,$h,$skip_small=1){
 
 		if($skip_small && $this->width<=$w && $this->height<=$h){
-			return $this->image;
+			return $this->resource;
 		}
 		else{
 			$ratio = max($this->width/$w,$this->height/$h);
@@ -165,7 +165,7 @@ class ImageResizer implements iResizer{
 			$this->resize($new_width,$new_height);
 		}
 
-		return $this->image;
+		return $this->resource;
 
 	}
 
