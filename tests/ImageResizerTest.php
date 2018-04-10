@@ -13,12 +13,6 @@ if (version_compare(PHP_VERSION, '7.0.0') >= 0 && !class_exists('PHPUnit_Framewo
 class ImageResizerTest extends PHPUnit_Framework_TestCase
 {
 
-	private $image_types = array(
-		'gif',
-		'jpeg',
-		'png'
-	);
-
 	private $tmp_files = array();
 
 	protected function tearDown(){
