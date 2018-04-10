@@ -144,7 +144,9 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 		  $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
 		  $resize = new ImageResizer($image);
 
-		  $new_image=$resize->resize($param['width']['new'],$param['height']['new']);
+		  $new_image = $resize
+					->resize($param['width']['new'],$param['height']['new'])
+					->getImage();
 
 		  $this->assertEquals($param['width']['new'], imagesx($new_image));
 		  $this->assertEquals($param['height']['new'], imagesy($new_image));
@@ -173,7 +175,9 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 		   $image = $this->createImage(200, $param['height']['orig'], $param['type']);
 		   $resize = new ImageResizer($image);
 
-		   $new_image=$resize->resizeToHeight($param['height']['set_value'],$param['skip_small']);
+		   $new_image = $resize
+			 		->resizeToHeight($param['height']['set_value'],$param['skip_small'])
+					->getImage();
 
 		   $this->assertEquals(200, imagesx($new_image));
 		   $this->assertEquals($param['height']['new'], imagesy($new_image));
@@ -200,7 +204,9 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 			$image = $this->createImage($param['width']['orig'], 200, $param['type']);
 			$resize = new ImageResizer($image);
 
-			$new_image=$resize->resizeToWidth($param['width']['set_value'],$param['skip_small']);
+			$new_image = $resize
+					->resizeToWidth($param['width']['set_value'],$param['skip_small'])
+					->getImage();
 
 			$this->assertEquals($param['width']['new'], imagesx($new_image));
 			$this->assertEquals(200, imagesy($new_image));
@@ -228,7 +234,9 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 			 $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
 			 $resize = new ImageResizer($image);
 
-			 $new_image=$resize->resizeToHeightWidth($param['width']['set_value'],$param['height']['set_value'],$param['skip_small']);
+			 $new_image = $resize
+			 			->resizeToHeightWidth($param['width']['set_value'],$param['height']['set_value'],$param['skip_small'])
+						->getImage();
 
 			 $this->assertEquals($param['width']['new'], imagesx($new_image));
 			 $this->assertEquals($param['height']['new'], imagesy($new_image));
@@ -262,10 +270,9 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 			$image = $this->createImage(500, 500, 'gif');
 
 			$resize = new ImageResizer($image);
-			$resize->resize(100,100);
-
 			$filename = $this->getTempFile();
-			$resize->save( $filename );
+
+			$resize->resize(100,100)->save( $filename );
 
 			list($width, $height, $type) = getimagesize( $filename );
 

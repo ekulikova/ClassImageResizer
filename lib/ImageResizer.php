@@ -82,7 +82,11 @@ class ImageResizer implements iResizer{
 
 	}
 
-	public function imageOutput($filename, $compression=75){
+	public function getImage(){
+		return $this->image;
+	}
+
+	public function output($filename=null, $compression=75){
 
 		if( $this->MIMEtype == IMAGETYPE_JPEG ) {
 			imagejpeg($this->image,$filename,$compression);
@@ -94,15 +98,13 @@ class ImageResizer implements iResizer{
 			throw new ImageResizerException('Could not output image '.$this->originPath);
 		}
 
-		return $this->image;
-
 	}
 
 	public function save($filename=null, $permissions=0777, $compression=75){
 
 		$filename or $filename=$this->originPath;
 
-		$this -> imageOutput($filename, $compression);
+		$this -> output($filename, $compression);
 
 		if($permissions) {
 			chmod($filename,$permissions);
@@ -116,14 +118,14 @@ class ImageResizer implements iResizer{
 		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height);
 		$this->update($new_image);
 
-		return $this->image;
+		return $this;
 
 	}
 
 	public function resizeToHeight($new_height,$skip_small=1){
 
 		if($skip_small && $this->height<=$new_height){
-			return $this->image;
+			return $this;
 		}
 		else{
 			$ratio = $this->height/$new_height;
@@ -132,14 +134,14 @@ class ImageResizer implements iResizer{
 			$this->resize($this->width,$new_height);
 		}
 
-		return $this->image;
+		return $this;
 
 	}
 
 	public function resizeToWidth($new_width,$skip_small=1){
 
 		if($skip_small && $this->width<=$new_width){
-			return $this->image;
+			return $this;
 		}
 		else{
 			$ratio = $this->width/$new_width;
@@ -148,14 +150,14 @@ class ImageResizer implements iResizer{
 			$this->resize($new_width,$this->height);
 		}
 
-		return $this->image;
+		return $this;
 
 	}
 
 	public function resizeToHeightWidth($new_width,$new_height,$skip_small=1){
 
 		if($skip_small && $this->width<=$new_width && $this->height<=$new_height){
-			return $this->image;
+			return $this;
 		}
 		else{
 			$ratio = max($this->width/$new_width,$this->height/$new_height);
@@ -165,7 +167,7 @@ class ImageResizer implements iResizer{
 			$this->resize($new_width,$new_height);
 		}
 
-		return $this->image;
+		return $this;
 
 	}
 
