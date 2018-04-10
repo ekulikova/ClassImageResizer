@@ -9,14 +9,16 @@ use EKulikova\ImageResizer;
 
 class RecursiveImageResizer implements iResizer{
 
-    private $dir;
+    private $originDir;
     private $recursive;
     private $images;
 
-    public function __construct($dir, $recursive=1){
-        $this->dir = $dir;
+    public function __construct($originDir, $recursive=1){
 
+        $this->originDir = $originDir;
         $this->recursive = $recursive;
+
+        $this->images = $this->setImages();
     }
 
     private function addImage($fileName){
@@ -29,9 +31,9 @@ class RecursiveImageResizer implements iResizer{
 
     }
 
-    private function getImagesRecursive(){
+    private function setImagesRecursive(){
 
-      $directory = new \RecursiveDirectoryIterator( $this->dir );
+      $directory = new \RecursiveDirectoryIterator( $this->originDir );
       $iterator = new \RecursiveIteratorIterator( $directory );
 
       foreach ($iterator as $fileInfo) {
@@ -47,9 +49,9 @@ class RecursiveImageResizer implements iResizer{
 
     }
 
-    private function getImagesNotRecursive(){
+    private function setImagesNotRecursive(){
 
-      $directory = new \DirectoryIterator($this->dir);
+      $directory = new \DirectoryIterator($this->originDir);
 
       foreach($directory as $file)
       {
@@ -64,22 +66,26 @@ class RecursiveImageResizer implements iResizer{
 
     }
 
-    public function getImages(){
+    private function setImages(){
 
       if( $this->recursive ){
-          $this->getImagesRecursive();
+          $this->setImagesRecursive();
       }
       else{
-          $this->getImagesNotRecursive();
+          $this->setImagesNotRecursive();
       }
 
         return $this->images;
 
     }
 
-    public function resize($new_width, $new_height){
+    public function getImages(){
 
-        $this->getImages();
+      return $this->images;
+
+    }
+
+    public function resize($new_width, $new_height){
 
         foreach ($this->images as $image) {
 
@@ -92,8 +98,6 @@ class RecursiveImageResizer implements iResizer{
 
     public function resizeToHeight($new_height, $skip_small=1){
 
-        $this->getImages();
-
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
@@ -105,8 +109,6 @@ class RecursiveImageResizer implements iResizer{
 
     public function resizeToWidth($new_width, $skip_small=1){
 
-        $this->getImages();
-
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
@@ -117,8 +119,6 @@ class RecursiveImageResizer implements iResizer{
     }
 
     public function resizeToHeightWidth($new_width, $new_height, $skip_small=1){
-
-        $this->getImages();
 
         foreach ($this->images as $image) {
 

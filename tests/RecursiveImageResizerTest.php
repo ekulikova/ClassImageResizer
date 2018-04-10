@@ -123,7 +123,6 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
       }
 
 			$this->testDir = $this->structure['dirs'][0];
-			//return $this->structure['dirs'][0];
 
    }
 
@@ -160,7 +159,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
       $rec = new RecursiveImageResizer( $this->testDir, $recursive );
 
       $images = $rec->getImages();
-
+			
       $this->assertEquals( count($images) ,$expected );
 
    }
