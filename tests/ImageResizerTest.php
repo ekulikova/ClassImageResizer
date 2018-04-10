@@ -42,10 +42,6 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	 private function createImage($width, $height, $type)
 	 {
 
-		 if (!in_array($type, $this->image_types)) {
-			 throw new ImageResizerException('Unsupported image type');
-		 }
-
 		 $image = imagecreatetruecolor($width, $height);
 
 		 $filename = $this->getTempFile();
@@ -68,7 +64,7 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 
 	   $rez=array();
 
-	   foreach ($this->image_types as $type) {
+	   foreach ( ImageResizer::PROPER_TYPES as $MIMEtype => $type ) {
 		   foreach($data as $param){
 			   $param['type'] = $type;
 			   array_push($rez,array($param));
@@ -100,10 +96,12 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	public function providerType ()
 	{
 
-		$types=array();
+		$types = array();
 
-		foreach ($this->image_types as $key=>$type) {
+		foreach ( array_values( ImageResizer::PROPER_TYPES ) as $key=>$type) {
+
 			$types[$key]=[$type];
+
 		}
 
 		return $types;
