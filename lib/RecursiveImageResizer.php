@@ -90,8 +90,7 @@ class RecursiveImageResizer implements iResizer{
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
-            $img -> resize($new_width, $new_height);
-            $img -> save();
+            $img -> resize($new_width, $new_height)-> save();
 
         }
     }
@@ -101,8 +100,7 @@ class RecursiveImageResizer implements iResizer{
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
-            $img -> resizeToHeight($new_height, $skip_small);
-            $img -> save();
+            $img -> resizeToHeight($new_height, $skip_small) -> save();
 
         }
     }
@@ -112,8 +110,7 @@ class RecursiveImageResizer implements iResizer{
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
-            $img -> resizeToWidth($new_width, $skip_small);
-            $img -> save();
+            $img -> resizeToWidth($new_width, $skip_small)->save();
 
         }
     }
@@ -123,8 +120,7 @@ class RecursiveImageResizer implements iResizer{
         foreach ($this->images as $image) {
 
             $img = new imageResizer($image);
-            $img -> resizeToHeightWidth($new_width, $new_height, $skip_small);
-            $img -> save();
+            $img -> resizeToHeightWidth($new_width, $new_height, $skip_small) -> save();
 
         }
     }
