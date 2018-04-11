@@ -15,10 +15,22 @@ class RecursiveImageResizer implements iResizer{
 
     public function __construct($originDir, $recursive=1){
 
-        $this->originDir = $originDir;
+        $this->setDir( $originDir );
+
         $this->recursive = $recursive;
 
-        $this->images = $this->setImages();
+        $this->setImages();
+    }
+
+    private function setDir( $originDir ){
+
+      if( is_Dir($originDir) ){
+        $this->originDir = $originDir;
+      }
+      else{
+        throw new RecursiveImageResizerException( 'Directory '.$originDir.' do not exists.' );
+      }
+
     }
 
     private function addImage($fileName){
@@ -75,7 +87,11 @@ class RecursiveImageResizer implements iResizer{
           $this->setImagesNotRecursive();
       }
 
-        return $this->images;
+      if( empty( $this->images ) ){
+        throw new RecursiveImageResizerException( 'There is no images.' );
+      }
+
+      return $this->images;
 
     }
 
@@ -89,8 +105,16 @@ class RecursiveImageResizer implements iResizer{
 
         foreach ($this->images as $image) {
 
+          try{
+
             $img = new imageResizer($image);
             $img -> resize($new_width, $new_height)-> save();
+
+          } catch ( ImageResizerException $e ) {
+
+            echo "Error: ".$e->getMessage();
+
+          }
 
         }
     }
@@ -98,30 +122,48 @@ class RecursiveImageResizer implements iResizer{
     public function resizeToHeight($new_height, $skip_small=1){
 
         foreach ($this->images as $image) {
+          try{
 
             $img = new imageResizer($image);
             $img -> resizeToHeight($new_height, $skip_small) -> save();
 
+          } catch ( ImageResizerException $e ) {
+
+            echo "Error: ".$e->getMessage();
+
+          }
         }
     }
 
     public function resizeToWidth($new_width, $skip_small=1){
 
         foreach ($this->images as $image) {
+          try{
 
             $img = new imageResizer($image);
             $img -> resizeToWidth($new_width, $skip_small)->save();
 
+          } catch ( ImageResizerException $e ) {
+
+            echo "Error: ".$e->getMessage();
+
+          }
         }
     }
 
     public function resizeToHeightWidth($new_width, $new_height, $skip_small=1){
 
         foreach ($this->images as $image) {
+          try{
 
             $img = new imageResizer($image);
             $img -> resizeToHeightWidth($new_width, $new_height, $skip_small) -> save();
 
+          } catch ( ImageResizerException $e ) {
+
+            echo "Error: ".$e->getMessage();
+
+          }
         }
     }
 
