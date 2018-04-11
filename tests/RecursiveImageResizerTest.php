@@ -21,7 +21,6 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 	private $orig_width = 500;
 	private $orig_height = 500;
 	private $img_type = 'jpeg';
-	private $testDir;
 
 	protected function setUp(){
 			$this->createStructure(3, 2);
@@ -37,7 +36,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
    private function getDirName($currentDepth){
 
-      $tmp_dir = sys_get_temp_dir().'/'.$this->testDir;
+      $tmp_dir = sys_get_temp_dir().'/';
 
       for($i = 1; $i<=$currentDepth; $i++){
         $tmp_dir .= '/RecursiveImageResizer'.$i;
@@ -146,6 +145,33 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 }
 
+	 /**
+	* Loading tests
+	*/
+
+	/**
+	 * @expectedException \EKulikova\RecursiveImageResizerException
+	 * @expectedExceptionMessage Directory noDir does not exists.
+	 */
+	public function testLoadNoDir()
+	{
+		new RecursiveImageResizer('noDir');
+	}
+
+	/**
+	 * @expectedException \EKulikova\RecursiveImageResizerException
+	 * @expectedExceptionMessage There is no images.
+	 */
+	public function testLoadNoImages()
+	{
+
+		$dirName = sys_get_temp_dir().'/emptyDir';
+		$this->createDir( $dirName );
+
+		new RecursiveImageResizer( $dirName );
+
+	}
+
    /**
    * Tests
    */
@@ -159,7 +185,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
       $rec = new RecursiveImageResizer( $this->testDir, $recursive );
 
       $images = $rec->getImages();
-			
+
       $this->assertEquals( count($images) ,$expected );
 
    }

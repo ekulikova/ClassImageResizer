@@ -28,7 +28,7 @@ class RecursiveImageResizer implements iResizer{
         $this->originDir = $originDir;
       }
       else{
-        throw new RecursiveImageResizerException( 'Directory '.$originDir.' do not exists.' );
+        throw new RecursiveImageResizerException( 'Directory '.$originDir.' does not exists.' );
       }
 
     }
