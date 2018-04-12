@@ -21,6 +21,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 	private $orig_width = 500;
 	private $orig_height = 500;
 	private $img_type = 'jpeg';
+	private $testDir;
 
 	protected function setUp(){
 			$this->createStructure(3, 2);
