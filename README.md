@@ -5,7 +5,7 @@ PHP libraries to resize images and bunch of images recursively.
 ImageResizer.php is library to resize image in different ways.
 RecursiveImageResizer.php uses the previous library and does the same things recursively.
 
-##ImageResizer.php##
+## ImageResizer.php
 
 Use this sintax for install the library:
 ```
@@ -58,7 +58,7 @@ $image->resizeToWidth($new_width [, $skip_small]);
 $image->save([$file_name]);
 ```
 
-###RecursiveImageResizer.php###
+### RecursiveImageResizer.php
 
 Use this sintax for install the library:
 ```
@@ -82,7 +82,7 @@ Resize
 ------
 
 At first you can resize directly, without keeping ratio.
-###Images with new dementions overwritten original images###
+### Images with new dementions overwritten original images
 The function has optional bollean parameter $recursive to go recursively.
 If $recursive=0 function resizes only images in the directory and doesn't go deeper.
 If $recursive=1 function goes throught all nested directories.
@@ -93,7 +93,7 @@ $rec->resize($new_width, $new_height[, $recursive]);
 ```
 
 To resize an image to best fit a given set of dimensions (keeping aspect ratio)
-###Images with new dementions overwritten original images###
+### Images with new dementions overwritten original images
 The function has optional bollean parameter $recursive to go recursively.
 If $recursive=0 function resizes only images in the directory and doesn't go deeper.
 If $recursive=1 function goes throught all nested directories.
@@ -104,7 +104,7 @@ $rec->resizeToHeightWidth($new_width, $new_height[, $recursive]);
 ```
 
 To resize an image according to one dimension (keeping aspect ratio):
-###Images with new dementions overwritten original images###
+### Images with new dementions overwritten original images
 The function has optional bollean parameter $recursive to go recursively.
 If $recursive=0 function resizes only images in the directory and doesn't go deeper.
 If $recursive=1 function goes throught all nested directories.
