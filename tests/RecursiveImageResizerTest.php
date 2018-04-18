@@ -21,7 +21,7 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 	private $orig_width = 500;
 	private $orig_height = 500;
 	private $img_type = 'jpeg';
-	private $testDir;
+	private $testDir; // $this->structure['dirs'][0];
 
 	protected function setUp(){
 			$this->createStructure(3, 2);
@@ -146,6 +146,15 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 
 	 }
 
+	 private function createNewDir(){
+		 $dirName = sys_get_temp_dir().'/newDir';
+		 if( mkdir($dirName) ){
+			 return $dirName;
+		 }
+	 }
+
+	 private function deleteNewDir(){}
+
 	 /**
 	* Loading tests
 	*/
@@ -218,6 +227,30 @@ class RecursiveImageResizerTest extends PHPUnit_Framework_TestCase
 				$this->assertEquals(100, $height);
 
 			}
+  }
+
+	public function testResizeSave(){
+		// create new dir
+		$newDir = $this->createNewDir();
+		//resize to it from testDir
+		$rec = new RecursiveImageResizer($this -> testDir, 1);
+
+		$rec->resize(100, 100, $newDir);
+		// check the image's dimentions
+		$newRec = new RecursiveImageResizer($newDir, 1);
+
+		$images = $newRec->getImages();
+
+		foreach ( $images as $img ) {
+
+			list( $width, $height ) = getimagesize( $img );
+			$this->assertEquals(100, $width);
+			$this->assertEquals(100, $height);
+
+		}
+		// delete newDir
+		$this->deleteNewDir();
+
   }
 
 	public function testResizeToHeight(){
