@@ -18,6 +18,10 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
   private $tmp_files = array();
 	private $tmp_dirs = array();
 
+	protected function tearDown(){
+			$this->destroyStructure();
+	}
+
   /**
 	 * Helpers
 	 */
@@ -32,15 +36,21 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 		 $output_function = 'image' . $type;
 		 $output_function($image, $filename);
 
+		 array_push($this->tmp_files, $filename);
+
 		 return $filename;
 	 }
 
-   private function getTempFile()
-	 {
-		 $tmp_file = tempnam(sys_get_temp_dir(), 'ImageResizerTest');
-		 array_push($this->tmp_files,$tmp_file);
+   private function getTempFile(){
 
-		 return $tmp_file;
+		 return tempnam(sys_get_temp_dir(), 'ImageResizerTest');
+
+	 }
+
+	 private function getTempDir(){
+
+		 return sys_get_temp_dir().'/ImageResizerTest';
+
 	 }
 
 	 private function createDir($dirName){
@@ -68,7 +78,9 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
 	 private function createDirectoryStructure($depth, $imgQuantity, $txtQuantity){
 
-		 $dir = $this->createDir( sys_get_temp_dir().'/ImageResizerTest' );
+		 $tempDir = $this->getTempDir();
+
+		 $dir = $this->createDir( $tempDir );
 
 		 for($j=1; $j<=$depth; $j++){
 
@@ -83,6 +95,28 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 		 		}
 
 	 		}
+
+			return $tempDir;
+
+	 }
+
+	 private function destroyStructure(){
+
+		 foreach ( $this->tmp_files as $file ) {
+
+			 unlink($file);
+
+		 }
+
+		 $this->tmp_files = [];
+
+		 foreach( array_reverse( $this->tmp_dirs ) as $dir ){
+
+				 rmdir($dir);
+
+		 }
+
+		 $this->tmp_dirs = [];
 
 	 }
 
