@@ -16,17 +16,18 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 {
 
   private $tmp_files = array();
+	private $tmp_dirs = array();
 
   /**
 	 * Helpers
 	 */
 
-	 private function createImage($width, $height, $type)
+	 private function createImage($width, $height, $type, $filename=null)
 	 {
 
-		 $image = imagecreatetruecolor($width, $height);
+		 $filename || $filename = $this->getTempFile();
 
-		 $filename = $this->getTempFile();
+		 $image = imagecreatetruecolor($width, $height);
 
 		 $output_function = 'image' . $type;
 		 $output_function($image, $filename);
@@ -36,10 +37,53 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
    private function getTempFile()
 	 {
-		 $tmp_file = tempnam(sys_get_temp_dir(), 'resize_test_image');
+		 $tmp_file = tempnam(sys_get_temp_dir(), 'ImageResizerTest');
 		 array_push($this->tmp_files,$tmp_file);
 
 		 return $tmp_file;
+	 }
+
+	 private function createDir($dirName){
+
+		 if( mkdir($dirName) ){
+
+				 array_push($this->tmp_dirs, $dirName);
+
+				 return $dirName;
+
+		 }
+
+		 return false;
+
+	 }
+
+	 private function createTxtFile( $fileName ){
+
+		 	file_put_contents( $fileName,'text file' );
+			array_push($this->tmp_files,$fileName);
+
+			return $fileName;
+
+	 }
+
+	 private function createDirectoryStructure($depth, $imgQuantity, $txtQuantity){
+
+		 $dir = $this->createDir( sys_get_temp_dir().'/ImageResizerTest' );
+
+		 for($j=1; $j<=$depth; $j++){
+
+			  $dir = $this->createDir( $dir.'/Dir'.$j );
+
+		 		for ($i=1; $i<=$imgQuantity; $i++){
+			 			$this->createImage(500, 500, 'gif', $dir.'/img'.$i);
+		 		}
+
+		 		for ($i=1; $i<=$txtQuantity; $i++){
+			 			$this->createTxtFile($dir.'/txt'.$i);
+		 		}
+
+	 		}
+
 	 }
 
   /**
@@ -228,6 +272,15 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 			 );
 
 		 return $data;
+
+	 }
+
+	 public function testDirectoryResize(){
+
+		 //create structure
+		 $this->createDirectoryStructure(3, 2, 1);
+		 //resize it
+		 //delete structure
 
 	 }
 

@@ -4,7 +4,7 @@ namespace EKulikova;
 require_once 'SingleImageResizer.php';
 
 use EKulikova\SingleImageResizer;
-
+use EKulikova\ImageResizerException;
 
 class RecursiveImageResizer{
 
@@ -17,6 +17,29 @@ class RecursiveImageResizer{
 
         $this->recursive = $recursive;
     }
+
+     public function __call($function, $arguments) {
+
+       $items = scandir( $this->originalDir, SCANDIR_SORT_NONE );
+
+       foreach( $items as $item ){
+
+          if( is_dir($item) ){
+            $this->__call($func, $arguments);
+          }
+          elseif( @exif_imagetype($item) ){
+
+            $img = new SingleImageResizer($item);
+            call_user_func_array( array($img, $function), $arguments );
+
+          }
+          else{
+            throw new ImageResizerException($item.' does not an image.');
+          }
+
+       }
+
+     }
 
     /*private function addImage($fileName){
 
