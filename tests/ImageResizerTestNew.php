@@ -311,11 +311,20 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
 	 public function testDirectoryResize(){
 
-		 //create structure
-		 $this->createDirectoryStructure(3, 2, 1);
-		 //resize it
-		 //delete structure
+		 $dir = $this->createDirectoryStructure(3, 2, 0);
 
+		 $resize = ImageResizer::getResizer($dir);
+
+		 $new_image = $resize->resize(100,100);
+
+		 foreach ( $this->tmp_files as $img ) {
+
+			 list( $width, $height ) = getimagesize( $img );
+			 $this->assertEquals(100, $width);
+			 $this->assertEquals(100, $height);
+
+		 }
+		 
 	 }
 
 

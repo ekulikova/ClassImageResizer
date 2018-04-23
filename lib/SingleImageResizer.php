@@ -32,7 +32,7 @@ class SingleImageResizer{
 
 	private function setImageInfo(){
 
-		list($this->width, $this->height, $this->MIMEtype) = getimagesize($this->originPath);
+		list($this->width, $this->height, $this->MIMEtype) = @getimagesize($this->originPath);
 
 		if(!$this->width || !$this->height){
 			throw new ImageResizerException('File '.$this->originPath.' is not an image');
