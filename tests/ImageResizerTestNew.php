@@ -315,7 +315,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
 		 $resize = ImageResizer::getResizer($dir);
 
-		 $new_image = $resize->resize(100,100);
+		 $new_image = $resize->resize(100,100)->save();
 
 		 foreach ( $this->tmp_files as $img ) {
 
@@ -324,7 +324,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 			 $this->assertEquals(100, $height);
 
 		 }
-		 
+
 	 }
 
 
