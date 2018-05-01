@@ -43,11 +43,11 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
    private function getTempFile(){
 
-		 return tempnam(sys_get_temp_dir(), 'ImageResizerTest');
+		 return tempnam(sys_get_temp_dir(), '/ImageResizerTest');
 
 	 }
 
-	 private function getTempDir(){
+	 private function getTempDirName(){
 
 		 return sys_get_temp_dir().'/ImageResizerTest';
 
@@ -78,8 +78,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 
 	 private function createDirectoryStructure($depth, $imgQuantity, $txtQuantity){
 
-		 $tempDir = $this->getTempDir();
-
+		 $tempDir = $this->getTempDirName();
 		 $dir = $this->createDir( $tempDir );
 
 		 for($j=1; $j<=$depth; $j++){
@@ -326,6 +325,32 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 		 }
 
 	 }
+
+	 public function testDirectoryResizeNewDir(){
+
+		$dir = $this->createDirectoryStructure(3, 2, 0);
+
+		$resize = ImageResizer::getResizer($dir);
+
+		$newDir = $this->getTempDirName().'New';
+
+		$new_image = $resize->resize(100,100)->save( $newDir );
+
+		foreach ( $this->tmp_files as $img ) {
+
+			list( $width, $height ) = getimagesize( $img );
+			$this->assertEquals(500, $width);
+			$this->assertEquals(500, $height);
+
+			$newImg = str_replace($dir, $newDir, $img);
+
+			list( $width, $height ) = getimagesize( $newImg );
+			$this->assertEquals(100, $width);
+			$this->assertEquals(100, $height);
+
+		}
+
+	}
 
 
 }

@@ -28,31 +28,94 @@ class RecursiveImageResizer{
         $this->function = $function;
         $this->arguments = $arguments;
 
+        $this->loadImages();
+
         return $this;
+
+    }
+
+    private function loadImages(){
+
+      if( $this->recursive ){
+          $this->loadImagesRecursive();
+      }
+      else{
+          $this->loadImagesNotRecursive();
+      }
+      if( empty( $this->images ) ){
+        throw new ImageResizerException( 'There are no images.' );
+      }
+
+    }
+
+    private function addImage($fileName){
+
+      if( @exif_imagetype( $fileName ) ){
+          $this->images[] = $fileName;
+      }
+
+    }
+
+    private function loadImagesRecursive(){
+
+      $directory = new \RecursiveDirectoryIterator( $this->originDir );
+      $iterator = new \RecursiveIteratorIterator( $directory );
+
+      foreach ($iterator as $fileInfo) {
+
+        if( $fileInfo->isFile() ) {
+          $fileName = $fileInfo->getPathname();
+          $this->addImage($fileName);
+        }
+
+      }
+
+    }
+
+    private function loadImagesNotRecursive(){
+
+      $directory = new \DirectoryIterator($this->originDir);
+
+      foreach($directory as $file){
+
+          if ( !$file->isDot()  && !$file->isDir() ){
+
+            $fileName = $file->getPathname();
+            $this->addImage($fileName);
+
+          }
+
+      }
+
+    }
+
+    private function getNewPath($pathName, $newDir){
+
+      if ($newDir) {
+        return str_replace($this->originDir, $newDir, $pathName);
+      } else {
+        return null;
+      }
 
     }
 
     public function save( $newDir=null ){
 
-      $iterator = new \RecursiveIteratorIterator(
-          new \RecursiveDirectoryIterator( $this->originDir ) );
+      foreach ($this->images as $pathName) {
 
-      foreach ($iterator as $pathName => $fileInfo) {
-
-            if( $fileInfo->getType() == 'file'  ) {
               try{
+
+                $newPath = $this -> getNewPath($pathName, $newDir);
 
                 $img = new SingleImageResizer($pathName);
                 call_user_func_array( array($img, $this->function), $this->arguments )
-                    ->save();
+                    ->save($newPath);
 
               } catch ( ImageResizerException $e ) {
 
                 echo $e->getMessage()."\n";
 
               }
-
-            }
 
       }
     }

@@ -88,9 +88,18 @@ class SingleImageResizer{
 
 	}
 
+	private function createPathDirectories( $filename ){
+
+		if(!file_exists(dirname($filename)))
+    		mkdir(dirname($filename), 0777, true);
+				
+	}
+
 	public function save($filename=null, $permissions=0777, $compression=75){
 
 		$filename or $filename=$this->originPath;
+
+		$this -> createPathDirectories($filename);
 
 		$this -> output($filename, $compression);
 
