@@ -1,34 +1,49 @@
 <?php
 namespace EKulikova;
 
-require_once 'ImageResizer.php';
-require_once 'IResizer.php';
+require_once 'SingleImageResizer.php';
 
-use EKulikova\ImageResizer;
+use EKulikova\SingleImageResizer;
+use EKulikova\ImageResizerException;
 
-
-class RecursiveImageResizer implements iResizer{
+class RecursiveImageResizer{
 
     private $originDir;
     private $recursive;
-    private $images;
+
+    private $images = array();
+
+    private $function;
+    private $arguments = array();
 
     public function __construct($originDir, $recursive=1){
 
-        $this->setDir( $originDir );
-
+        $this->originDir = $originDir;
         $this->recursive = $recursive;
 
-        $this->setImages();
     }
 
-    private function setDir( $originDir ){
+    public function __call($function, $arguments){
 
-      if( is_Dir($originDir) ){
-        $this->originDir = $originDir;
+        $this->function = $function;
+        $this->arguments = $arguments;
+
+        $this->loadImages();
+
+        return $this;
+
+    }
+
+    private function loadImages(){
+
+      if( $this->recursive ){
+          $this->loadImagesRecursive();
       }
       else{
-        throw new RecursiveImageResizerException( 'Directory '.$originDir.' does not exists.' );
+          $this->loadImagesNotRecursive();
+      }
+      if( empty( $this->images ) ){
+        throw new ImageResizerException( 'There are no images.' );
       }
 
     }
@@ -36,14 +51,12 @@ class RecursiveImageResizer implements iResizer{
     private function addImage($fileName){
 
       if( @exif_imagetype( $fileName ) ){
-
           $this->images[] = $fileName;
-
       }
 
     }
 
-    private function setImagesRecursive(){
+    private function loadImagesRecursive(){
 
       $directory = new \RecursiveDirectoryIterator( $this->originDir );
       $iterator = new \RecursiveIteratorIterator( $directory );
@@ -51,124 +64,60 @@ class RecursiveImageResizer implements iResizer{
       foreach ($iterator as $fileInfo) {
 
         if( $fileInfo->isFile() ) {
-
           $fileName = $fileInfo->getPathname();
           $this->addImage($fileName);
-
         }
 
       }
 
     }
 
-    private function setImagesNotRecursive(){
+    private function loadImagesNotRecursive(){
 
       $directory = new \DirectoryIterator($this->originDir);
 
-      foreach($directory as $file)
-      {
-          if ( !$file->isDot()  && !$file->isDir() )
-          {
+      foreach($directory as $file){
+
+          if ( !$file->isDot()  && !$file->isDir() ){
 
             $fileName = $file->getPathname();
             $this->addImage($fileName);
 
           }
+
       }
 
     }
 
-    private function setImages(){
+    private function getNewPath($pathName, $newDir){
 
-      if( $this->recursive ){
-          $this->setImagesRecursive();
-      }
-      else{
-          $this->setImagesNotRecursive();
-      }
-
-      if( empty( $this->images ) ){
-        throw new RecursiveImageResizerException( 'There is no images.' );
+      if ($newDir) {
+        return str_replace($this->originDir, $newDir, $pathName);
+      } else {
+        return null;
       }
 
-      return $this->images;
-
     }
 
-    public function getImages(){
+    public function save( $newDir=null ){
 
-      return $this->images;
+      foreach ($this->images as $pathName) {
 
+              try{
+
+                $newPath = $this -> getNewPath($pathName, $newDir);
+
+                $img = new SingleImageResizer($pathName);
+                call_user_func_array( array($img, $this->function), $this->arguments )
+                    ->save($newPath);
+
+              } catch ( ImageResizerException $e ) {
+
+                echo $e->getMessage()."\n";
+
+              }
+
+      }
     }
 
-    public function resize($new_width, $new_height){
-
-        foreach ($this->images as $image) {
-
-          try{
-
-            $img = new imageResizer($image);
-            $img -> resize($new_width, $new_height)-> save();
-
-          } catch ( ImageResizerException $e ) {
-
-            echo "Error: ".$e->getMessage();
-
-          }
-
-        }
-    }
-
-    public function resizeToHeight($new_height, $skip_small=1){
-
-        foreach ($this->images as $image) {
-          try{
-
-            $img = new imageResizer($image);
-            $img -> resizeToHeight($new_height, $skip_small) -> save();
-
-          } catch ( ImageResizerException $e ) {
-
-            echo "Error: ".$e->getMessage();
-
-          }
-        }
-    }
-
-    public function resizeToWidth($new_width, $skip_small=1){
-
-        foreach ($this->images as $image) {
-          try{
-
-            $img = new imageResizer($image);
-            $img -> resizeToWidth($new_width, $skip_small)->save();
-
-          } catch ( ImageResizerException $e ) {
-
-            echo "Error: ".$e->getMessage();
-
-          }
-        }
-    }
-
-    public function resizeToHeightWidth($new_width, $new_height, $skip_small=1){
-
-        foreach ($this->images as $image) {
-          try{
-
-            $img = new imageResizer($image);
-            $img -> resizeToHeightWidth($new_width, $new_height, $skip_small) -> save();
-
-          } catch ( ImageResizerException $e ) {
-
-            echo "Error: ".$e->getMessage();
-
-          }
-        }
-    }
-
-}
-
-class RecursiveImageResizerException extends \Exception
-{
 }
