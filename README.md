@@ -22,7 +22,7 @@ $resizer = ImageResizer::getResizer($full_path[, $recursive]);
 > Note:
 This library uses GD class which do not support resizing animated gif files
 
-###Resize###
+### Resize
 
 ```php
 $resizer = ImageResizer::getResizer('image.jpg');
@@ -42,7 +42,7 @@ $recursive - optional boolean parameter. Defaults to true.
             If $recursive is false function resizes only images in the directory and doesn't go deeper.
             Otherwise function goes through all nested directories.
 
-**Return values**
+**Return values:**
 Returns instance of SingleImageResizer for single image or instance of RecursiveImageResizer for directory.
 
 ### 2. Resizing.
