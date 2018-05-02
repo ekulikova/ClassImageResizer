@@ -1,98 +1,146 @@
 <?php
 
 require_once __DIR__.'/../lib/ImageResizer.php';
+require_once __DIR__.'/../lib/SingleImageResizer.php';
 
 use EKulikova\ImageResizer;
 use EKulikova\ImageResizerException;
+use EKulikova\SingleImageResizer;
 
 
 if (version_compare(PHP_VERSION, '7.0.0') >= 0 && !class_exists('PHPUnit_Framework_TestCase')) {
 	class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
 }
 
-class ImageResizerTest extends PHPUnit_Framework_TestCase
+class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 {
 
-	private $tmp_files = array();
+  private $tmp_files = array();
+	private $tmp_dirs = array();
 
 	protected function tearDown(){
-			$this->destroyImages();
+			$this->destroyStructure();
 	}
 
-	private function destroyImages(){
-
-		foreach ($this->tmp_files as $file) {
-			if(file_exists($file)) {
-				unlink($file);
-			}
-		}
-
-	}
-
-	/**
+  /**
 	 * Helpers
 	 */
 
-	 private function createImage($width, $height, $type)
+	 private function createImage($width, $height, $type, $filename=null)
 	 {
 
-		 $image = imagecreatetruecolor($width, $height);
+		 $filename || $filename = $this->getTempFile();
 
-		 $filename = $this->getTempFile();
+		 $image = imagecreatetruecolor($width, $height);
 
 		 $output_function = 'image' . $type;
 		 $output_function($image, $filename);
 
+		 array_push($this->tmp_files, $filename);
+
 		 return $filename;
 	 }
 
-	 private function getTempFile()
-	 {
-		 $tmp_file = tempnam(sys_get_temp_dir(), 'resize_test_image');
-		 array_push($this->tmp_files,$tmp_file);
+   private function getTempFile(){
 
-		 return $tmp_file;
-	 }
-
-	 private function addTypesToData($data){
-
-	   $rez=array();
-
-	   foreach ( ImageResizer::PROPER_TYPES as $MIMEtype => $type ) {
-		   foreach($data as $param){
-			   $param['type'] = $type;
-			   array_push($rez,array($param));
-		   }
-	   }
-
-	   return $rez;
+		 return tempnam(sys_get_temp_dir(), '/ImageResizerTest');
 
 	 }
 
-   /**
-	* Loading tests
-	*/
+	 private function getTempDirName(){
 
-   /**
-	* @dataProvider providerType
-	*/
+		 return sys_get_temp_dir().'/ImageResizerTest';
 
-	public function testLoad($type)
-	{
+	 }
 
-		$image = $this->createImage(1, 1, $type);
-		$resize = new ImageResizer($image);
+	 private function createDir($dirName){
 
-		$this->assertInstanceOf('\EKulikova\ImageResizer', $resize);
+		 if( mkdir($dirName) ){
 
-	}
+				 array_push($this->tmp_dirs, $dirName);
 
-	public function providerType ()
-	{
+				 return $dirName;
+
+		 }
+
+		 return false;
+
+	 }
+
+	 private function createTxtFile( $fileName ){
+
+		 	file_put_contents( $fileName,'text file' );
+			array_push($this->tmp_files,$fileName);
+
+			return $fileName;
+
+	 }
+
+	 private function createDirectoryStructure($depth, $imgQuantity, $txtQuantity){
+
+		 $tempDir = $this->getTempDirName();
+		 $dir = $this->createDir( $tempDir );
+
+		 for($j=1; $j<=$depth; $j++){
+
+			  $dir = $this->createDir( $dir.'/Dir'.$j );
+
+		 		for ($i=1; $i<=$imgQuantity; $i++){
+			 			$this->createImage(500, 500, 'gif', $dir.'/img'.$i);
+		 		}
+
+		 		for ($i=1; $i<=$txtQuantity; $i++){
+			 			$this->createTxtFile($dir.'/txt'.$i);
+		 		}
+
+	 		}
+
+			return $tempDir;
+
+	 }
+
+	 private function destroyStructure(){
+
+		 foreach ( $this->tmp_files as $file ) {
+
+			 unlink($file);
+
+		 }
+
+		 $this->tmp_files = [];
+
+		 foreach( array_reverse( $this->tmp_dirs ) as $dir ){
+
+				 rmdir($dir);
+
+		 }
+
+		 $this->tmp_dirs = [];
+
+	 }
+
+  /**
+  * Loading tests
+  */
+
+  /**
+  * @dataProvider providerType
+  */
+
+  public function testLoadImage($type){
+
+   $image = $this->createImage(1, 1, $type);
+   $resizer = ImageResizer::getResizer($image);
+
+   $this->assertInstanceOf('\EKulikova\SingleImageResizer', $resizer);
+
+  }
+
+  public function providerType (){
 
 		$types = array();
 
-		foreach ( array_values( ImageResizer::PROPER_TYPES ) as $key=>$type) {
+		foreach ( array_values( SingleImageResizer::PROPER_TYPES ) as $key=>$type) {
 
 			$types[$key]=[$type];
 
@@ -101,17 +149,24 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 		return $types;
 	}
 
+	public function testLoadDir(){
+
+			$resizer = ImageResizer::getResizer(__DIR__);
+			$this->assertInstanceOf('\EKulikova\RecursiveImageResizer', $resizer);
+
+	}
+
 	/**
 	 * Bad load tests
 	 */
 
 	 /**
 	  * @expectedException \EKulikova\ImageResizerException
-	  * @expectedExceptionMessage noFile.gif is not a file or does not exist.
+	  * @expectedExceptionMessage noFile.gif does not exist.
 	  */
 	 public function testLoadNoFile()
 	 {
-		 new ImageResizer('noFile.gif');
+		 ImageResizer::getResizer('noFile.gif');
 	 }
 
 	 /**
@@ -120,158 +175,180 @@ class ImageResizerTest extends PHPUnit_Framework_TestCase
 	  */
 	 public function testLoadNoImage()
 	 {
-		 new ImageResizer(__FILE__);
+		 ImageResizer::getResizer(__FILE__);
 	 }
 
 	 /**
 	  * Resize tests
 	  */
 
-	 /**
-	  * @dataProvider providerResize
-	  */
-
-	  public function testResize($param){
-
-		  $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
-		  $resize = new ImageResizer($image);
-
-		  $new_image = $resize
-					->resize($param['width']['new'],$param['height']['new'])
-					->getImage();
-
-		  $this->assertEquals($param['width']['new'], imagesx($new_image));
-		  $this->assertEquals($param['height']['new'], imagesy($new_image));
-
-	  }
-
-	  public function providerResize()
-	  {
-
-		  $data = array(
-			  		array('height'=>['orig'=>200, 'new'=>100],'width'=>['orig'=>100, 'new'=>80]),
-					array('height'=>['orig'=>100, 'new'=>150],'width'=>['orig'=>100, 'new'=>150]),
-					array('height'=>['orig'=>100, 'new'=>50],'width'=>['orig'=>200, 'new'=>120]),
-				);
-
-		return $this->addTypesToData($data);
-
-		}
-
-	  /**
-	   * @dataProvider providerResizeToHeight
-	   */
-
-	   public function testResizeToHeight($param){
-
-		   $image = $this->createImage(200, $param['height']['orig'], $param['type']);
-		   $resize = new ImageResizer($image);
-
-		   $new_image = $resize
-			 		->resizeToHeight($param['height']['set_value'],$param['skip_small'])
-					->getImage();
-
-		   $this->assertEquals(200, imagesx($new_image));
-		   $this->assertEquals($param['height']['new'], imagesy($new_image));
-
-	   }
-
-	   public function providerResizeToHeight()
-	   {
-		   $data=array(
-				  array('height'=>['orig'=>100,'set_value'=>60,'new'=>60],'skip_small'=>1),
-				  array('height'=>['orig'=>100,'set_value'=>150,'new'=>100],'skip_small'=>1),
-				  array('height'=>['orig'=>100,'set_value'=>130,'new'=>130],'skip_small'=>0),
-			 );
-
-			return $this->addTypesToData($data);
-		}
-
-	   /**
-		* @dataProvider providerResizeToWidth
-		*/
-
-		public function testResizeToWidth($param){
-
-			$image = $this->createImage($param['width']['orig'], 200, $param['type']);
-			$resize = new ImageResizer($image);
-
-			$new_image = $resize
-					->resizeToWidth($param['width']['set_value'],$param['skip_small'])
-					->getImage();
-
-			$this->assertEquals($param['width']['new'], imagesx($new_image));
-			$this->assertEquals(200, imagesy($new_image));
-		}
-
-	   public function providerResizeToWidth()
-		{
-
-		  $data=array(
-				   array('width'=>['orig'=>100,'set_value'=>60,'new'=>60],'skip_small'=>1),
-				   array('width'=>['orig'=>100,'set_value'=>150,'new'=>100],'skip_small'=>1),
-				   array('width'=>['orig'=>100,'set_value'=>130,'new'=>130],'skip_small'=>0),
-			  );
-
-		  return $this->addTypesToData($data);
-
-		}
-
 		/**
-		 * @dataProvider providerResizeToHeightWidth
-		 */
+ 	  * @dataProvider providerResize
+ 	  */
 
-		 public function testResizeToHeightWidth($param){
+		public function testResize($height, $width){
 
-			 $image = $this->createImage($param['width']['orig'], $param['height']['orig'], $param['type']);
-			 $resize = new ImageResizer($image);
+		 $image = $this->createImage($width['orig'], $height['orig'], 'gif');
+		 $resize = ImageResizer::getResizer($image);
 
-			 $new_image = $resize
-			 			->resizeToHeightWidth($param['width']['set_value'],$param['height']['set_value'],$param['skip_small'])
-						->getImage();
+		 $new_image = $resize
+				 ->resize($width['new'],$height['new'])
+				 ->getImage();
 
-			 $this->assertEquals($param['width']['new'], imagesx($new_image));
-			 $this->assertEquals($param['height']['new'], imagesy($new_image));
-		 }
-
-		public function providerResizeToHeightWidth()
-		 {
-
-		   $data=array(
-					  array('width'=>['orig'=>200,'set_value'=>100,'new'=>100],
-							'height'=>['orig'=>500,'set_value'=>280,'new'=>250],
-							'skip_small'=>1),
-					  array('width'=>['orig'=>100,'set_value'=>100,'new'=>100],
-							'height'=>['orig'=>150,'set_value'=>250,'new'=>150],
-							'skip_small'=>1),
-					  array('width'=>['orig'=>100,'set_value'=>200,'new'=>200],
-							'height'=>['orig'=>150,'set_value'=>330,'new'=>300],
-							'skip_small'=>0),
-			   );
-
-		   return $this->addTypesToData($data);
-
-		 }
-
-		 /**
-	 * Save and Output functions test
-	 */
-
-	 public function testSave(){
-
-			$image = $this->createImage(500, 500, 'gif');
-
-			$resize = new ImageResizer($image);
-			$filename = $this->getTempFile();
-
-			$resize->resize(100,100)->save( $filename );
-
-			list($width, $height, $type) = getimagesize( $filename );
-
-			$this->assertEquals(100, $width);
-			$this->assertEquals(100, $height);
-			$this->assertEquals(IMAGETYPE_GIF, $type);
+		 $this->assertEquals($width['new'], imagesx($new_image));
+		 $this->assertEquals($height['new'], imagesy($new_image));
 
 	 }
+
+	 public function providerResize()
+	 {
+
+		 $data = array(
+				 array('height'=>['orig'=>200, 'new'=>100],'width'=>['orig'=>100, 'new'=>80]),
+				 array('height'=>['orig'=>100, 'new'=>150],'width'=>['orig'=>100, 'new'=>150]),
+				 array('height'=>['orig'=>100, 'new'=>50],'width'=>['orig'=>200, 'new'=>120]),
+			 );
+
+	 return $data;
+
+	 }
+
+	 /**
+		* @dataProvider providerResizeToHeight
+		*/
+
+		public function testResizeToHeight($height, $skip_small){
+
+			$image = $this->createImage(200, $height['orig'], 'gif');
+			$resize = ImageResizer::getResizer($image);
+
+			$new_image = $resize
+				 ->resizeToHeight($height['new'],$skip_small)
+				 ->getImage();
+
+			$this->assertEquals(200, imagesx($new_image));
+			$this->assertEquals($height['result'], imagesy($new_image));
+
+		}
+
+		public function providerResizeToHeight()
+		{
+			$data=array(
+				 array('height'=>['orig'=>100,'new'=>60,'result'=>60],'skip_small'=>1),
+				 array('height'=>['orig'=>100,'new'=>150,'result'=>100],'skip_small'=>1),
+				 array('height'=>['orig'=>100,'new'=>130,'result'=>130],'skip_small'=>0),
+			);
+
+		 return $data;
+	 }
+
+	 /**
+	* @dataProvider providerResizeToWidth
+	*/
+
+	public function testResizeToWidth($width, $skip_small){
+
+		$image = $this->createImage($width['orig'], 200, 'gif');
+		$resize = ImageResizer::getResizer($image);
+
+		$new_image = $resize
+				->resizeToWidth($width['new'],$skip_small)
+				->getImage();
+
+		$this->assertEquals($width['result'], imagesx($new_image));
+		$this->assertEquals(200, imagesy($new_image));
+	}
+
+	 public function providerResizeToWidth(){
+
+		$data=array(
+				 array('width'=>['orig'=>100,'new'=>60,'result'=>60],'skip_small'=>1),
+				 array('width'=>['orig'=>100,'new'=>150,'result'=>100],'skip_small'=>1),
+				 array('width'=>['orig'=>100,'new'=>130,'result'=>130],'skip_small'=>0),
+			);
+
+		return $data;
+
+	}
+
+	/**
+	 * @dataProvider providerResizeToHeightWidth
+	 */
+
+	 public function testResizeToHeightWidth($width, $height, $skip_small){
+
+		 $image = $this->createImage($width['orig'], $height['orig'], 'gif');
+		 $resize = ImageResizer::getResizer($image);
+
+		 $new_image = $resize
+					->resizeToHeightWidth($width['new'],$height['new'],$skip_small)
+					->getImage();
+
+		 $this->assertEquals($width['result'], imagesx($new_image));
+		 $this->assertEquals($height['result'], imagesy($new_image));
+	 }
+
+	public function providerResizeToHeightWidth(){
+
+		 $data=array(
+					array('width'=>['orig'=>200,'new'=>100,'result'=>100],
+						'height'=>['orig'=>500,'new'=>280,'result'=>250],
+						'skip_small'=>1),
+					array('width'=>['orig'=>100,'new'=>100,'result'=>100],
+						'height'=>['orig'=>150,'new'=>250,'result'=>150],
+						'skip_small'=>1),
+					array('width'=>['orig'=>100,'new'=>200,'result'=>200],
+						'height'=>['orig'=>150,'new'=>330,'result'=>300],
+						'skip_small'=>0),
+			 );
+
+		 return $data;
+
+	 }
+
+	 public function testDirectoryResize(){
+
+		 $dir = $this->createDirectoryStructure(3, 2, 0);
+
+		 $resize = ImageResizer::getResizer($dir);
+
+		 $new_image = $resize->resize(100,100)->save();
+
+		 foreach ( $this->tmp_files as $img ) {
+
+			 list( $width, $height ) = getimagesize( $img );
+			 $this->assertEquals(100, $width);
+			 $this->assertEquals(100, $height);
+
+		 }
+
+	 }
+
+	 public function testDirectoryResizeNewDir(){
+
+		$dir = $this->createDirectoryStructure(3, 2, 0);
+
+		$resize = ImageResizer::getResizer($dir);
+
+		$newDir = $this->getTempDirName().'New';
+
+		$new_image = $resize->resize(100,100)->save( $newDir );
+
+		foreach ( $this->tmp_files as $img ) {
+
+			list( $width, $height ) = getimagesize( $img );
+			$this->assertEquals(500, $width);
+			$this->assertEquals(500, $height);
+
+			$newImg = str_replace($dir, $newDir, $img);
+
+			list( $width, $height ) = getimagesize( $newImg );
+			$this->assertEquals(100, $width);
+			$this->assertEquals(100, $height);
+
+		}
+
+	}
+
 
 }
