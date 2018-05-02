@@ -204,7 +204,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 	 {
 
 		 $data = array(
-					 array('height'=>['orig'=>200, 'new'=>100],'width'=>['orig'=>100, 'new'=>80]),
+				 array('height'=>['orig'=>200, 'new'=>100],'width'=>['orig'=>100, 'new'=>80]),
 				 array('height'=>['orig'=>100, 'new'=>150],'width'=>['orig'=>100, 'new'=>150]),
 				 array('height'=>['orig'=>100, 'new'=>50],'width'=>['orig'=>200, 'new'=>120]),
 			 );
@@ -259,8 +259,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 		$this->assertEquals(200, imagesy($new_image));
 	}
 
-	 public function providerResizeToWidth()
-	{
+	 public function providerResizeToWidth(){
 
 		$data=array(
 				 array('width'=>['orig'=>100,'new'=>60,'result'=>60],'skip_small'=>1),
@@ -289,8 +288,7 @@ class ImageResizerTestNew extends PHPUnit_Framework_TestCase
 		 $this->assertEquals($height['result'], imagesy($new_image));
 	 }
 
-	public function providerResizeToHeightWidth()
-	 {
+	public function providerResizeToHeightWidth(){
 
 		 $data=array(
 					array('width'=>['orig'=>200,'new'=>100,'result'=>100],
